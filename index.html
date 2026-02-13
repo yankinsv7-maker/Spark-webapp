@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SPARK AUTO</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body { background: #000; color: #fff; font-family: sans-serif; margin: 0; padding: 15px; display: flex; justify-content: center; }
         .app { width: 100%; max-width: 400px; }
@@ -14,14 +15,15 @@
         .tab { flex: 1; padding: 15px; background: #1c1c1e; border-radius: 12px; text-align: center; cursor: pointer; border: 2px solid transparent; color: #888; }
         .tab.active-rf { border-color: #007aff; color: #fff; }
         .tab.active-cn { border-color: #ff3b30; color: #fff; }
-        .item { background: #1c1c1e; padding: 15px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #333; cursor: pointer; }
+        .item { background: #1c1c1e; padding: 15px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #333; cursor: pointer; transition: 0.3s; }
         .item.selected { border-color: #34c759; background: #1e2a1e; }
         .item b { display: block; font-size: 16px; }
         .item span { font-size: 12px; color: #888; }
         .price { color: #34c759; font-weight: bold; font-size: 18px; }
         input { width: 100%; padding: 18px; background: #1c1c1e; border: 1px solid #333; border-radius: 12px; color: #fff; font-size: 18px; text-align: center; margin: 15px 0; box-sizing: border-box; }
         .check-row { display: flex; gap: 10px; font-size: 12px; color: #888; margin-bottom: 20px; align-items: flex-start; }
-        .check-row input { width: 24px; height: 24px; margin: 0; flex-shrink: 0; }
+        .check-row input { width: 22px; height: 22px; margin: 0; flex-shrink: 0; }
+        .check-row a { color: #007aff; text-decoration: none; }
         .btn { width: 100%; padding: 20px; border-radius: 14px; border: none; font-weight: bold; font-size: 16px; cursor: pointer; text-transform: uppercase; background: #34c759; color: #fff; }
         .loader { border: 4px solid #333; border-top: 4px solid #34c759; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 100px auto 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -38,26 +40,26 @@
         </div>
 
         <div id="group-rf">
-            <div class="item selected" onclick="setPrice(this, '99₽', 'Spark Base')">
+            <div class="item selected" onclick="setPrice(this, '99', 'Spark Base')">
                 <div><b>Spark Base</b><span>Угон, залоги, аресты</span></div>
                 <div class="price">99₽</div>
             </div>
-            <div class="item" onclick="setPrice(this, '199₽', 'Spark Standard')">
+            <div class="item" onclick="setPrice(this, '199', 'Spark Standard')">
                 <div><b>Spark Standard</b><span>Пробеги, Владельцы</span></div>
                 <div class="price">199₽</div>
             </div>
-            <div class="item" onclick="setPrice(this, '299₽', 'Spark Full')">
+            <div class="item" onclick="setPrice(this, '299', 'Spark Full')">
                 <div><b>Spark Full</b><span>ДТП, Ремонты, Такси</span></div>
                 <div class="price">299₽</div>
             </div>
         </div>
 
         <div id="group-cn" style="display:none">
-            <div class="item" onclick="setPrice(this, '490₽', 'China Lite')">
+            <div class="item" onclick="setPrice(this, '490', 'China Lite')">
                 <div><b>China Lite</b><span>Тех-данные, Экспорт</span></div>
                 <div class="price">490₽</div>
             </div>
-            <div class="item" onclick="setPrice(this, '1490₽', 'China Full')">
+            <div class="item" onclick="setPrice(this, '1490', 'China Full')">
                 <div><b>China Full</b><span>История обслуживания</span></div>
                 <div class="price">1490₽</div>
             </div>
@@ -67,7 +69,7 @@
 
         <div class="check-row">
             <input type="checkbox" id="agreed">
-            <span>Я подтверждаю ознакомление с офертой. Вся ответственность за использование данных лежит на мне.</span>
+            <span>Я подтверждаю ознакомление с <a href="#" onclick="alert('Тут будет текст вашей оферты: ответственность, сроки и т.д.')">офертой</a>. Вся ответственность за использование данных лежит на мне.</span>
         </div>
 
         <button class="btn" onclick="runSearch()">ЗАПУСТИТЬ ПРОВЕРКУ</button>
@@ -84,33 +86,27 @@
             <p>Объект: <b id="res-vin"></b></p>
             <p>Тариф: <b id="res-tariff"></b></p>
             <hr style="border:0; border-top:1px solid #333; margin:15px 0;">
-            <p style="font-size:20px">К оплате: <b id="res-price" style="color:#34c759"></b></p>
+            <p style="font-size:20px">К оплате: <b id="res-price"></b><b>₽</b></p>
         </div>
         <button class="btn" onclick="sendPay()">ОПЛАТИТЬ И ПОЛУЧИТЬ</button>
     </div>
 </div>
 
 <script>
-    // ТВОЙ НОВЫЙ ВЕБХУК ТУТ:
+    const tg = window.Telegram.WebApp;
+    tg.expand(); // Раскрываем приложение на весь экран
+
     const HOOK_URL = "https://hook.eu1.make.com/9ddudragp3yeyhrv5ko1yi26e80wjca0";
-    
-    let curPrice = "99₽", curTariff = "Spark Base", curCountry = "RF";
+    let curPrice = "99", curTariff = "Spark Base";
 
     function setTab(c) {
-        curCountry = c;
         document.getElementById('t-rf').className = c==='RF' ? 'tab active-rf' : 'tab';
         document.getElementById('t-cn').className = c==='CN' ? 'tab active-cn' : 'tab';
         document.getElementById('group-rf').style.display = c==='RF' ? 'block' : 'none';
         document.getElementById('group-cn').style.display = c==='CN' ? 'block' : 'none';
         
-        document.querySelectorAll('.item').forEach(i => i.classList.remove('selected'));
-        if(c === 'RF') {
-            curPrice = "99₽"; curTariff = "Spark Base";
-            document.querySelector('#group-rf .item').classList.add('selected');
-        } else {
-            curPrice = "490₽"; curTariff = "China Lite";
-            document.querySelector('#group-cn .item').classList.add('selected');
-        }
+        if(c === 'RF') { setPrice(document.querySelector('#group-rf .item'), '99', 'Spark Base'); }
+        else { setPrice(document.querySelector('#group-cn .item'), '490', 'China Lite'); }
     }
 
     function setPrice(el, p, t) {
@@ -121,7 +117,7 @@
 
     function runSearch() {
         const vinVal = document.getElementById('vin').value;
-        if(!document.getElementById('agreed').checked) return alert("Нужно ваше согласие!");
+        if(!document.getElementById('agreed').checked) return alert("Нужно принять оферту!");
         if(vinVal.length < 5) return alert("Введите VIN!");
 
         document.getElementById('res-vin').innerText = vinVal;
@@ -131,25 +127,30 @@
         document.getElementById('s-main').classList.remove('active');
         document.getElementById('s-load').classList.add('active');
 
-        fetch(HOOK_URL, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ action: 'start', vin: vinVal, price: curPrice, tariff: curTariff })
-        });
-
         setTimeout(() => {
             document.getElementById('s-load').classList.remove('active');
             document.getElementById('s-res').classList.add('active');
-        }, 3000);
+        }, 2500);
     }
 
     function sendPay() {
+        // Автоматически берем данные пользователя из Telegram
+        const user = tg.initDataUnsafe?.user;
+        const userId = user ? user.id : "unknown";
+
         fetch(HOOK_URL, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ action: 'pay', vin: document.getElementById('res-vin').innerText, price: curPrice, tariff: document.getElementById('res-tariff').innerText })
+            body: JSON.stringify({ 
+                action: 'pay', 
+                vin: document.getElementById('res-vin').innerText, 
+                price: curPrice, 
+                tariff: curTariff,
+                telegram_id: userId
+            })
         });
-        alert("Запрос на оплату отправлен в Telegram!");
+        alert("Запрос отправлен! Закройте приложение и проверьте чат с ботом.");
+        tg.close(); // Закрываем WebApp после нажатия
     }
 </script>
 
