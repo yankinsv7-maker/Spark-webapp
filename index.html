@@ -7,142 +7,184 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
-            --bg-color: #0c0c0e;
-            --card-bg: rgba(30, 30, 32, 0.85);
-            --accent-rf: #007aff;
+            --bg: #0c0c0e;
+            --card: #1c1c1e;
+            --accent: #007aff;
             --accent-cn: #ff3b30;
-            --text-primary: #ffffff;
-            --text-secondary: #8e8e93;
+            --text: #ffffff;
+            --text-dim: #8e8e93;
             --success: #34c759;
         }
+
         body {
-            background-color: var(--bg-color); color: var(--text-primary);
-            font-family: -apple-system, sans-serif; margin: 0; padding: 20px;
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0; padding: 20px;
             display: flex; flex-direction: column; align-items: center;
-            min-height: 100vh; position: relative; overflow-x: hidden;
+            overflow-x: hidden;
         }
-        .bg-flag {
-            position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%);
-            width: 150%; height: 100%; object-fit: cover; opacity: 0;
-            transition: opacity 1s ease; z-index: -1; filter: blur(60px) brightness(0.2);
+
+        .screen { display: none; width: 100%; max-width: 360px; animation: fadeIn 0.3s ease; }
+        .active { display: block; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        h2 { font-size: 20px; text-align: center; margin-bottom: 5px; font-weight: 800; }
+        .subtitle { color: var(--text-dim); font-size: 11px; text-align: center; margin-bottom: 25px; letter-spacing: 1px; }
+
+        .selector { display: flex; gap: 10px; margin-bottom: 20px; }
+        .type-card {
+            flex: 1; background: var(--card); padding: 15px; border-radius: 16px;
+            text-align: center; border: 2px solid transparent; transition: 0.2s; cursor: pointer;
         }
-        .active-flag { opacity: 0.7; }
-        h1 { font-size: 22px; margin: 10px 0 5px; font-weight: 900; letter-spacing: 1px; }
-        .subtitle { color: var(--text-secondary); font-size: 11px; margin-bottom: 25px; text-transform: uppercase; }
-        .selector { display: flex; gap: 12px; width: 100%; max-width: 380px; margin-bottom: 25px; }
-        .card {
-            flex: 1; background: var(--card-bg); padding: 15px; border-radius: 18px;
-            text-align: center; border: 2px solid transparent; transition: 0.3s; cursor: pointer;
-            backdrop-filter: blur(10px);
+        .type-card.selected-rf { border-color: var(--accent); background: rgba(0,122,255,0.1); }
+        .type-card.selected-cn { border-color: var(--accent-cn); background: rgba(255,59,48,0.1); }
+
+        .input-box {
+            width: 100%; background: var(--card); border-radius: 14px;
+            padding: 15px; margin-bottom: 15px; box-sizing: border-box;
+            border: 1px solid #333; font-size: 18px; color: white; text-align: center; text-transform: uppercase;
         }
-        .card.active-rf { border-color: var(--accent-rf); box-shadow: 0 0 20px rgba(0,122,255,0.2); }
-        .card.active-cn { border-color: var(--accent-cn); box-shadow: 0 0 20px rgba(255,59,48,0.2); }
-        .input-group { width: 100%; max-width: 340px; margin-bottom: 15px; }
-        input {
-            width: 100%; padding: 18px; border-radius: 15px; border: 1px solid #333;
-            background: rgba(40, 40, 42, 0.9); color: white; font-size: 18px;
-            text-align: center; text-transform: uppercase; outline: none; box-sizing: border-box;
+
+        .agreement { display: flex; align-items: flex-start; gap: 10px; margin: 15px 0; font-size: 12px; color: var(--text-dim); }
+        .agreement b { color: var(--accent); text-decoration: underline; cursor: pointer; }
+        input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent); }
+
+        .loader {
+            width: 50px; height: 50px; border: 4px solid #333; border-top-color: var(--accent);
+            border-radius: 50%; animation: spin 1s linear infinite; margin: 40px auto 20px;
         }
-        .sources-info { font-size: 10px; color: var(--text-secondary); text-align: center; margin-bottom: 20px; }
-        .agreement {
-            display: flex; align-items: center; gap: 10px; width: 100%; max-width: 340px;
-            margin-bottom: 25px; background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px;
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .status-line { font-size: 13px; color: var(--text-dim); margin: 8px 0; text-align: center; }
+
+        .res-card { background: var(--card); border-radius: 16px; padding: 20px; margin-top: 10px; }
+        .res-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #2c2c2e; font-size: 14px; }
+        .res-row:last-child { border: none; }
+        
+        .price-btn {
+            width: 100%; background: var(--success); color: white; border: none;
+            padding: 18px; border-radius: 16px; font-weight: 700; font-size: 16px; margin-top: 20px; cursor: pointer;
         }
-        .agreement input { width: 20px; height: 20px; margin: 0; cursor: pointer; }
-        .agreement label { font-size: 11px; color: var(--text-secondary); line-height: 1.3; }
-        .price-list { width: 100%; max-width: 380px; margin-bottom: 25px; }
-        .price-item {
-            background: var(--card-bg); padding: 15px; border-radius: 16px;
-            margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;
-        }
-        .price-val { color: var(--success); font-weight: 800; font-size: 17px; }
-        .btn-example {
-            background: none; border: 1px solid #444; color: var(--text-secondary);
-            padding: 12px 25px; border-radius: 25px; font-size: 12px; cursor: pointer;
-            transition: 0.3s; margin-bottom: 40px;
-        }
+
+        #legal-text { font-size: 13px; color: var(--text-dim); line-height: 1.5; height: 300px; overflow-y: scroll; padding: 10px; background: #111; border-radius: 10px; }
     </style>
 </head>
 <body>
-    <img id="flag-rf" class="bg-flag active-flag" src="https://flagcdn.com/w1280/ru.png">
-    <img id="flag-cn" class="bg-flag" src="https://flagcdn.com/w1280/cn.png">
 
-    <h1>SPARK AUTO CHECK</h1>
-    <div class="subtitle">Сервис честных проверок по всей России</div>
+    <div id="screen-main" class="screen active">
+        <h2>SPARK AUTO CHECK</h2>
+        <div class="subtitle">ПРОВЕРКА ИСТОРИИ АВТОМОБИЛЯ</div>
 
-    <div class="selector">
-        <div id="btn-rf" class="card active-rf" onclick="setType('RF')">
-            <span style="font-size: 24px;">🇷🇺</span><br>
-            <span style="font-size: 14px; font-weight: 700;">РФ / СНГ</span>
+        <div class="selector">
+            <div id="card-rf" class="type-card selected-rf" onclick="setType('RF')">
+                <span style="font-size: 24px;">🇷🇺</span><br><b>РФ / СНГ</b>
+            </div>
+            <div id="card-cn" class="type-card" onclick="setType('CN')">
+                <span style="font-size: 24px;">🇨🇳</span><br><b>КИТАЙ</b>
+            </div>
         </div>
-        <div id="btn-cn" class="card" onclick="setType('CN')">
-            <span style="font-size: 24px;">🇨🇳</span><br>
-            <span style="font-size: 14px; font-weight: 700;">КИТАЙ</span>
-        </div>
-    </div>
 
-    <div class="input-group">
-        <input type="text" id="vin-input" placeholder="ВВЕДИТЕ VIN">
-    </div>
-    
-    <div id="sources-text" class="sources-info">🔍 Базы: ГИБДД, ФНП, РСА, ФССП, ТАМОЖНЯ</div>
-
-    <div class="agreement">
-        <input type="checkbox" id="agree-check" checked>
-        <label for="agree-check">Я ознакомлен с <b>правилами сервиса</b> и подтверждаю корректность данных.</label>
-    </div>
-
-    <div class="price-list">
-        <div class="price-item">
-            <div><b style="font-size: 14px;">Краткий отчет</b><br><small style="color:#666">Угон и залоги</small></div>
-            <div class="price-val">199 ₽</div>
-        </div>
-        <div class="price-item">
-            <div><b style="font-size: 14px;">Полная история</b><br><small style="color:#666">ДТП, пробеги, такси</small></div>
-            <div class="price-val">399 ₽</div>
+        <input type="text" id="vin-input" class="input-box" placeholder="ВВЕДИТЕ VIN / НОМЕР">
+        
+        <div class="agreement">
+            <input type="checkbox" id="check-legal">
+            <span>Я прочитал и согласен с <b onclick="showScreen('screen-legal')">публичной офертой</b></span>
         </div>
     </div>
 
-    <button class="btn-example" onclick="openExample()">👁 ПОСМОТРЕТЬ ПРИМЕР ОТЧЕТА</button>
+    <div id="screen-legal" class="screen">
+        <h2>ПУБЛИЧНАЯ ОФЕРТА</h2>
+        <div id="legal-text">
+            <p>1. Общие положения: Сервис предоставляет отчеты на основе данных ГИБДД и открытых источников.</p>
+            <p>2. Оплата: Услуга считается оказанной в момент генерации ссылки на отчет.</p>
+            <p>3. Возврат: Возврат средств невозможен после формирования отчета.</p>
+            <p>4. Конфиденциальность: Мы не храним ваши персональные данные.</p>
+        </div>
+        <button class="price-btn" style="background: var(--accent);" onclick="showScreen('screen-main')">ПРИНЯТЬ И ВЕРНУТЬСЯ</button>
+    </div>
+
+    <div id="screen-loading" class="screen">
+        <div class="loader"></div>
+        <h2 id="load-title">АНАЛИЗ ДАННЫХ</h2>
+        <div class="status-line" id="s1">● Подключение к базам ГИБДД...</div>
+        <div class="status-line" id="s2" style="opacity:0">● Проверка на залоги и розыск...</div>
+        <div class="status-line" id="s3" style="opacity:0">● Поиск истории пробегов...</div>
+    </div>
+
+    <div id="screen-result" class="screen">
+        <h2 style="color: var(--success);">ДАННЫЕ НАЙДЕНЫ!</h2>
+        <div class="res-card">
+            <div class="res-row"><span>Объект:</span><b id="res-vin">-</b></div>
+            <div class="res-row"><span>История ДТП:</span><b>Проверено</b></div>
+            <div class="res-row"><span>Залоги:</span><b>Проверено</b></div>
+            <div class="res-row"><span>Пробеги:</span><b>Найдено 3+ записи</b></div>
+        </div>
+        <button class="price-btn" onclick="startPay()">ОПЛАТИТЬ ОТЧЕТ — 399₽</button>
+    </div>
 
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
         let currentType = 'RF';
-        tg.MainButton.setText("ЗАПУСТИТЬ ПРОВЕРКУ").show().enable();
+        const makeUrl = "https://hook.eu1.make.com/deve7mhscs6nxy86x4dbxknph4e3jp4z";
+
+        tg.MainButton.setText("ЗАПУСТИТЬ ПРОВЕРКУ").show();
 
         function setType(type) {
             currentType = type;
-            const isRF = type === 'RF';
-            document.getElementById('btn-rf').className = isRF ? 'card active-rf' : 'card';
-            document.getElementById('btn-cn').className = !isRF ? 'card active-cn' : 'card';
-            document.getElementById('flag-rf').className = isRF ? 'bg-flag active-flag' : 'bg-flag';
-            document.getElementById('flag-cn').className = !isRF ? 'bg-flag active-flag' : 'bg-flag';
-            document.getElementById('sources-text').innerText = isRF ? "🔍 Базы: ГИБДД, ФНП, РСА, ФССП, ТАМОЖНЯ" : "🔍 Базы: EXPORT DB, CTR, КНР";
+            document.getElementById('card-rf').className = type === 'RF' ? 'type-card selected-rf' : 'type-card';
+            document.getElementById('card-cn').className = type === 'CN' ? 'type-card selected-cn' : 'type-card';
+            tg.MainButton.setParams({color: type === 'RF' ? '#007aff' : '#ff3b30'});
         }
 
-        function openExample() {
-            tg.showPopup({ title: 'Пример отчета', message: 'Вы получите данные о пробегах, ДТП и залогах.', buttons: [{text: 'ОК', type: 'ok'}] });
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            if(id === 'screen-main') tg.MainButton.show(); else tg.MainButton.hide();
         }
 
         tg.MainButton.onClick(function() {
             const vin = document.getElementById('vin-input').value;
-            const agreed = document.getElementById('agree-check').checked;
-            if (!agreed) return tg.showAlert("Примите правила!");
-            if (vin.length < 5) return tg.showAlert("Введите VIN!");
+            const agree = document.getElementById('check-legal').checked;
 
-            tg.MainButton.showProgress();
-            
-            // ТВОЯ ССЫЛКА УЖЕ ЗДЕСЬ
-            const webHookUrl = "https://hook.eu1.make.com/deve7mhscs6nxy86x4dbxknph4e3jp4z";
+            if(!agree) return tg.showAlert("Примите условия оферты!");
+            if(vin.length < 5) return tg.showAlert("Введите корректный VIN!");
 
-            fetch(webHookUrl, {
+            document.getElementById('res-vin').innerText = vin;
+            showScreen('screen-loading');
+
+            setTimeout(() => { document.getElementById('s2').style.opacity = 1; }, 1500);
+            setTimeout(() => { document.getElementById('s3').style.opacity = 1; }, 3000);
+            setTimeout(() => { showScreen('screen-result'); }, 4500);
+
+            // Отправка в Make
+            fetch(makeUrl, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ vin: vin, type: currentType, user: tg.initDataUnsafe.user })
-            }).then(() => { tg.close(); });
+                body: JSON.stringify({ 
+                    vin: vin, 
+                    type: currentType, 
+                    user: tg.initDataUnsafe.user,
+                    action: 'search_started'
+                })
+            });
         });
+
+        function startPay() {
+            // Сигнал в Make, что клиент нажал "Оплатить"
+            fetch(makeUrl, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ 
+                    vin: document.getElementById('res-vin').innerText,
+                    user: tg.initDataUnsafe.user,
+                    action: 'pay_clicked'
+                })
+            });
+            tg.showAlert("Запрос на оплату отправлен! Проверьте сообщения в боте через несколько секунд.");
+            setTimeout(() => { tg.close(); }, 2000);
+        }
     </script>
 </body>
 </html>
-
