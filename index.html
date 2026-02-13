@@ -10,177 +10,52 @@
             --bg: #0c0c0e; --card: #1c1c1e; --accent: #007aff; --accent-cn: #ff3b30;
             --text: #ffffff; --text-dim: #8e8e93; --success: #34c759;
         }
-        body { background-color: var(--bg); color: var(--text); font-family: -apple-system, system-ui, sans-serif; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; }
+        body { background-color: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
         .screen { display: none; width: 100%; max-width: 360px; animation: fadeIn 0.3s ease; }
         .active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         
-        h2 { font-size: 20px; text-align: center; margin-bottom: 5px; font-weight: 800; }
-        .subtitle { color: var(--text-dim); font-size: 11px; text-align: center; margin-bottom: 25px; letter-spacing: 1px; }
+        h2 { font-size: 20px; text-align: center; margin-bottom: 5px; font-weight: 900; letter-spacing: -0.5px; }
+        .subtitle { color: var(--text-dim); font-size: 10px; text-align: center; margin-bottom: 20px; letter-spacing: 1px; }
 
-        .selector { display: flex; gap: 10px; margin-bottom: 20px; }
-        .type-card { flex: 1; background: var(--card); padding: 15px 10px; border-radius: 16px; text-align: center; border: 2px solid transparent; cursor: pointer; }
+        .selector { display: flex; gap: 8px; margin-bottom: 15px; width: 100%; }
+        .type-card { flex: 1; background: var(--card); padding: 12px; border-radius: 12px; text-align: center; border: 2px solid transparent; cursor: pointer; transition: 0.2s; font-weight: bold; font-size: 14px; }
         .type-card.selected-rf { border-color: var(--accent); background: rgba(0,122,255,0.1); }
         .type-card.selected-cn { border-color: var(--accent-cn); background: rgba(255,59,48,0.1); }
-        .base-list { font-size: 9px; color: #555; margin-top: 8px; line-height: 1.2; text-transform: uppercase; }
 
-        /* Тарифы */
-        .price-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 15px; }
-        .price-item { background: var(--card); padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #2c2c2e; cursor: pointer; }
+        .price-grid { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+        .price-item { background: var(--card); padding: 15px; border-radius: 14px; border: 1px solid #2c2c2e; position: relative; transition: 0.2s; }
         .price-item.selected { border-color: var(--success); background: rgba(52,199,89,0.05); }
-        .price-info b { display: block; font-size: 14px; }
-        .price-info span { font-size: 11px; color: var(--text-dim); }
-        .price-tag { color: var(--success); font-weight: 700; font-size: 15px; }
+        .price-info b { font-size: 15px; display: block; margin-bottom: 4px; color: var(--success); }
+        .price-info span { font-size: 11px; color: var(--text-dim); display: block; }
+        .price-tag { position: absolute; top: 15px; right: 15px; font-weight: 900; font-size: 18px; }
 
-        .input-box { width: 100%; background: var(--card); border-radius: 14px; padding: 15px; margin: 15px 0; box-sizing: border-box; border: 1px solid #333; font-size: 18px; color: white; text-align: center; text-transform: uppercase; }
-        .agreement { display: flex; align-items: flex-start; gap: 10px; margin: 15px 0; font-size: 11px; color: var(--text-dim); }
-        .agreement b { color: var(--accent); text-decoration: underline; cursor: pointer; }
+        .arrow-btn { background: none; border: none; color: var(--accent); cursor: pointer; font-size: 10px; padding: 8px 0 0; display: flex; align-items: center; gap: 5px; text-transform: uppercase; font-weight: bold; margin-top: 10px; border-top: 1px solid #2c2c2e; width: 100%; }
+        .details { display: none; padding: 10px 0 0; font-size: 12px; color: var(--text-dim); line-height: 1.4; animation: slideDown 0.3s ease; }
+        .details.show { display: block; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+
+        .input-box { width: 100%; background: var(--card); border-radius: 14px; padding: 16px; margin: 20px 0 10px; box-sizing: border-box; border: 1px solid #333; font-size: 18px; color: white; text-align: center; font-weight: bold; text-transform: uppercase; }
+        .agreement { font-size: 10px; color: var(--text-dim); text-align: center; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 5px; }
         
-        .loader { width: 50px; height: 50px; border: 4px solid #333; border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; margin: 40px auto 20px; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .status-line { font-size: 13px; color: var(--text-dim); margin: 8px 0; text-align: center; }
-
-        .price-btn { width: 100%; background: var(--success); color: white; border: none; padding: 18px; border-radius: 16px; font-weight: 700; font-size: 16px; margin-top: 20px; cursor: pointer; }
-        #legal-text { font-size: 13px; color: var(--text-dim); line-height: 1.5; height: 300px; overflow-y: scroll; padding: 15px; background: #111; border-radius: 10px; }
+        .price-btn { width: 100%; background: var(--success); color: white; border: none; padding: 18px; border-radius: 16px; font-weight: 800; font-size: 16px; cursor: pointer; box-shadow: 0 4px 15px rgba(52,199,89,0.3); }
+        
+        .loader { border: 4px solid #333; border-top: 4px solid var(--accent); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 15px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
     <div id="screen-main" class="screen active">
-        <h2>SPARK AUTO CHECK</h2>
-        <div class="subtitle">ПРОВЕРКА ИСТОРИИ АВТОМОБИЛЯ</div>
+        <h2>SPARK AUTO</h2>
+        <div class="subtitle">ПРОВЕРКА ПО ВСЕМ БАЗАМ РФ И КИТАЯ</div>
 
         <div class="selector">
-            <div id="card-rf" class="type-card selected-rf" onclick="setType('RF')">
-                <span style="font-size: 24px;">🇷🇺</span><br><b>РФ И СНГ</b>
-                <div class="base-list">ГИБДД • ФНП • РСА • ФССП</div>
-            </div>
-            <div id="card-cn" class="type-card" onclick="setType('CN')">
-                <span style="font-size: 24px;">🇨🇳</span><br><b>КИТАЙ</b>
-                <div class="base-list">C-ASAM • CBX • ЭКСПОРТ</div>
-            </div>
+            <div id="card-rf" class="type-card selected-rf" onclick="setType('RF')">🇷🇺 РФ</div>
+            <div id="card-cn" class="type-card" onclick="setType('CN')">🇨🇳 КИТАЙ</div>
         </div>
 
-        <div id="prices-rf" class="price-grid">
-            <div class="price-item selected" onclick="selectPrice(this, '399₽')">
-                <div class="price-info"><b>1 ОТЧЕТ</b><span>Базовая проверка VIN</span></div>
-                <div class="price-tag">399₽</div>
-            </div>
-            <div class="price-item" onclick="selectPrice(this, '1490₽')">
-                <div class="price-info"><b>ПАКЕТ "5 ОТЧЕТОВ"</b><span>Выгода 25%</span></div>
-                <div class="price-tag">1490₽</div>
-            </div>
-        </div>
+        <div id="price-container" class="price-grid"></div>
 
-        <div id="prices-cn" class="price-grid" style="display:none">
-            <div class="price-item selected" onclick="selectPrice(this, '990₽')">
-                <div class="price-info"><b>ЭКСПРЕСС КИТАЙ</b><span>Тех. параметры и экспорт</span></div>
-                <div class="price-tag">990₽</div>
-            </div>
-            <div class="price-item" onclick="selectPrice(this, '2490₽')">
-                <div class="price-info"><b>ПОЛНЫЙ ИСТОРИЯ</b><span>История обслуживания в КНР</span></div>
-                <div class="price-tag">2490₽</div>
-            </div>
-        </div>
+        <input type="text" id="
 
-        <input type="text" id="vin-input" class="input-box" placeholder="ВВЕДИТЕ VIN / НОМЕР">
-        
-        <div class="agreement">
-            <input type="checkbox" id="check-legal">
-            <span>Я согласен с <b onclick="showScreen('screen-legal')">публичной офертой</b></span>
-        </div>
-    </div>
-
-    <div id="screen-legal" class="screen">
-        <h2>ПУБЛИЧНАЯ ОФЕРТА</h2>
-        <div id="legal-text">
-            <p>Настоящая оферта регулирует порядок предоставления информационных отчетов об истории ТС...</p>
-            <p>Оплата услуги подтверждает ваше согласие с правилами сервиса Spark Auto Check.</p>
-        </div>
-        <button class="price-btn" style="background: var(--accent);" onclick="showScreen('screen-main')">ВЕРНУТЬСЯ</button>
-    </div>
-
-    <div id="screen-loading" class="screen">
-        <div class="loader"></div>
-        <h2 id="load-title">АНАЛИЗ ДАННЫХ</h2>
-        <div class="status-line" id="s1">● Доступ к шлюзу баз данных...</div>
-        <div class="status-line" id="s2" style="opacity:0">● Проверка юридической чистоты...</div>
-        <div class="status-line" id="s3" style="opacity:0">● Поиск записей истории...</div>
-    </div>
-
-    <div id="screen-result" class="screen">
-        <h2 style="color: var(--success);">ОТЧЕТ ГОТОВ!</h2>
-        <div style="background:var(--card); padding:20px; border-radius:16px; margin-top:10px">
-            <div style="display:flex; justify-content:space-between; margin-bottom:10px"><span>Объект:</span><b id="res-vin">-</b></div>
-            <div style="display:flex; justify-content:space-between; color:var(--success)"><span>Выбранный тариф:</span><b id="res-price">399₽</b></div>
-        </div>
-        <button class="price-btn" onclick="startPay()">ОПЛАТИТЬ И ПОЛУЧИТЬ</button>
-    </div>
-
-    <script>
-        let tg = window.Telegram.WebApp;
-        tg.expand();
-        let currentType = 'RF';
-        let currentPrice = '399₽';
-        const makeUrl = "https://hook.eu1.make.com/deve7mhscs6nxy86x4dbxknph4e3jp4z";
-
-        tg.MainButton.setText("ЗАПУСТИТЬ ПРОВЕРКУ").show();
-
-        function setType(type) {
-            currentType = type;
-            document.getElementById('card-rf').className = type === 'RF' ? 'type-card selected-rf' : 'type-card';
-            document.getElementById('card-cn').className = type === 'CN' ? 'type-card selected-cn' : 'type-card';
-            document.getElementById('prices-rf').style.display = type === 'RF' ? 'grid' : 'none';
-            document.getElementById('prices-cn').style.display = type === 'CN' ? 'grid' : 'none';
-            
-            // Сброс выбора цены при смене страны
-            currentPrice = type === 'RF' ? '399₽' : '990₽';
-            document.querySelectorAll('.price-item').forEach(el => el.classList.remove('selected'));
-            document.querySelector(type === 'RF' ? '#prices-rf .price-item' : '#prices-cn .price-item').classList.add('selected');
-            
-            tg.MainButton.setParams({color: type === 'RF' ? '#007aff' : '#ff3b30'});
-        }
-
-        function selectPrice(el, price) {
-            document.querySelectorAll('.price-item').forEach(i => i.classList.remove('selected'));
-            el.classList.add('selected');
-            currentPrice = price;
-        }
-
-        function showScreen(id) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            if(id === 'screen-main') tg.MainButton.show(); else tg.MainButton.hide();
-        }
-
-        tg.MainButton.onClick(function() {
-            const vin = document.getElementById('vin-input').value;
-            if(!document.getElementById('check-legal').checked) return tg.showAlert("Примите оферту!");
-            if(vin.length < 5) return tg.showAlert("Введите VIN!");
-
-            document.getElementById('res-vin').innerText = vin;
-            document.getElementById('res-price').innerText = currentPrice;
-            showScreen('screen-loading');
-
-            setTimeout(() => { document.getElementById('s2').style.opacity = 1; }, 1500);
-            setTimeout(() => { document.getElementById('s3').style.opacity = 1; }, 3000);
-            setTimeout(() => { showScreen('screen-result'); }, 4500);
-
-            fetch(makeUrl, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ vin: vin, type: currentType, price: currentPrice, user: tg.initDataUnsafe.user, status: 'search_started' })
-            });
-        });
-
-        function startPay() {
-            fetch(makeUrl, {
-                method: 'POST', headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ vin: document.getElementById('res-vin').innerText, price: currentPrice, user: tg.initDataUnsafe.user, status: 'pay_clicked' })
-            });
-            tg.showAlert("Запрос на оплату " + currentPrice + " отправлен!");
-            setTimeout(() => { tg.close(); }, 2000);
-        }
-    </script>
-</body>
-</html>
