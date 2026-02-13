@@ -3,117 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Spark Auto Check</title>
+    <title>Spark Auto</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root { --bg: #0c0c0e; --card: #1c1c1e; --accent: #007aff; --success: #34c759; --text: #ffffff; --err: #ff3b30; }
-        body { background-color: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; padding: 15px; display: flex; flex-direction: column; min-height: 100vh; }
-        
-        /* Экраны */
-        .screen { display: none; width: 100%; animation: fadeIn 0.3s; }
-        .active { display: block !important; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        body {
+            background-color: #0c0c0e;
+            color: #ffffff;
+            font-family: sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
 
-        h2 { text-align: center; margin: 10px 0 20px; font-weight: 800; font-size: 22px; }
+        /* Стили карточек и кнопок */
+        .card {
+            background: #1c1c1e;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border: 1px solid #333;
+        }
+
+        .btn-main {
+            width: 100%;
+            padding: 18px;
+            background-color: #34c759; /* Зеленый */
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            text-transform: uppercase;
+        }
+
+        .btn-main:active { opacity: 0.8; transform: scale(0.98); }
 
         /* Переключатель стран */
         .selector { display: flex; gap: 10px; margin-bottom: 20px; }
-        .type-card { flex: 1; background: var(--card); padding: 15px; border-radius: 12px; text-align: center; border: 2px solid transparent; cursor: pointer; transition: 0.2s; }
-        .selected-rf { border-color: var(--accent); background: rgba(0,122,255,0.15); }
-        .selected-cn { border-color: #ff3b30; background: rgba(255,59,48,0.15); }
+        .type-btn {
+            flex: 1;
+            padding: 15px;
+            background: #1c1c1e;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            text-align: center;
+            color: #888;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .type-btn.active-rf { border-color: #007aff; color: #fff; background: rgba(0,122,255,0.1); }
+        .type-btn.active-cn { border-color: #ff3b30; color: #fff; background: rgba(255,59,48,0.1); }
 
         /* Тарифы */
-        .price-item { background: var(--card); padding: 12px 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #333; margin-bottom: 8px; cursor: pointer; }
-        .price-item.selected { border-color: var(--success); background: rgba(52,199,89,0.1); }
-        .price-info b { display: block; font-size: 14px; margin-bottom: 3px; }
-        .price-info span { font-size: 11px; color: #8e8e93; }
-        .price-tag { color: var(--success); font-weight: 700; font-size: 16px; }
-
-        /* Ввод и Галочка */
-        input[type="text"] { width: 100%; background: var(--card); border: 1px solid #333; padding: 15px; border-radius: 12px; color: #fff; text-align: center; margin: 15px 0; box-sizing: border-box; outline: none; font-size: 16px; text-transform: uppercase; }
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            margin-bottom: 8px;
+            background: #2c2c2e;
+            border-radius: 8px;
+            border: 1px solid transparent;
+            cursor: pointer;
+        }
+        .price-row.selected { border-color: #34c759; background: rgba(52,199,89,0.1); }
         
-        .agreement-box { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 10px; margin-bottom: 20px; font-size: 11px; line-height: 1.4; display: flex; gap: 10px; align-items: flex-start; }
-        .agreement-box input { width: 20px; height: 20px; margin: 0; accent-color: var(--success); cursor: pointer; }
-        .agreement-text b { text-decoration: underline; color: var(--accent); cursor: pointer; }
+        /* Поля ввода */
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid #444;
+            background: #1c1c1e;
+            color: white;
+            font-size: 18px;
+            text-align: center;
+            box-sizing: border-box;
+            outline: none;
+            text-transform: uppercase;
+        }
 
-        /* Кнопки и прочее */
-        .price-btn { width: 100%; background: var(--success); color: white; border: none; padding: 16px; border-radius: 12px; font-weight: 700; font-size: 16px; cursor: pointer; margin-top: 15px; }
-        
-        /* Текст оферты */
-        #legal-full { font-size: 12px; color: #ccc; height: 300px; overflow-y: scroll; padding: 10px; background: #000; border: 1px solid #333; border-radius: 8px; line-height: 1.5; }
-    </style>
-</head>
-<body>
-
-    <div id="screen-main" class="screen active">
-        <h2>SPARK AUTO</h2>
-
-        <div class="selector">
-            <div id="card-rf" class="type-card selected-rf" onclick="setType('RF')">🇷🇺 РФ</div>
-            <div id="card-cn" class="type-card" onclick="setType('CN')">🇨🇳 КИТАЙ</div>
-        </div>
-
-        <div id="prices-rf">
-            <div class="price-item selected" onclick="setPrice(this, '99₽', 'Spark Base')">
-                <div class="price-info"><b>Spark Base</b><span>Угон, залоги, аресты</span></div>
-                <div class="price-tag">99₽</div>
-            </div>
-            <div class="price-item" onclick="setPrice(this, '199₽', 'Spark Standard')">
-                <div class="price-info"><b>Spark Standard</b><span>Base + Пробеги и Владельцы</span></div>
-                <div class="price-tag">199₽</div>
-            </div>
-            <div class="price-item" onclick="setPrice(this, '299₽', 'Spark Full')">
-                <div class="price-info"><b>Spark Full</b><span>ДТП, Ремонты, Такси, Фото</span></div>
-                <div class="price-tag">299₽</div>
-            </div>
-        </div>
-
-        <div id="prices-cn" style="display:none">
-            <div class="price-item" onclick="setPrice(this, '490₽', 'China Lite')">
-                <div class="price-info"><b>China Lite</b><span>Тех-параметры и Экспорт</span></div>
-                <div class="price-tag">490₽</div>
-            </div>
-            <div class="price-item" onclick="setPrice(this, '1490₽', 'China Full')">
-                <div class="price-info"><b>China Full</b><span>История обслуживания в КНР</span></div>
-                <div class="price-tag">1490₽</div>
-            </div>
-        </div>
-
-        <input type="text" id="vin-input" placeholder="ВВЕДИТЕ VIN / НОМЕР">
-        
-        <div class="agreement-box">
-            <input type="checkbox" id="check-legal">
-            <div class="agreement-text">
-                Я подтверждаю, что ознакомился с <b onclick="show('screen-legal')">офертой</b>. Я осознаю, что вся ответственность за использование полученных данных лежит на мне.
-            </div>
-        </div>
-    </div>
-
-    <div id="screen-legal" class="screen">
-        <h2>ОТКАЗ ОТ ОТВЕТСТВЕННОСТИ</h2>
-        <div id="legal-full">
-            <p>1. <b>Предоставление данных:</b> Сервис Spark Auto предоставляет информационные услуги на основе открытых источников (ГИБДД, ФНП, РСА, Реестры КНР).</p>
-            <p>2. <b>Ответственность клиента:</b> Нажимая кнопку "Запустить проверку", Клиент безоговорочно подтверждает, что вся ответственность за интерпретацию и использование полученных данных, а также за любые юридические действия с автомобилем, лежит исключительно на Клиенте.</p>
-            <p>3. <b>Отказ от гарантий:</b> Сервис не несет ответственности за неполноту данных в официальных государственных базах источников.</p>
-            <p>4. <b>Оплата:</b> Услуга считается оказанной в момент отправки ссылки на отчет.</p>
-        </div>
-        <button class="price-btn" style="background:var(--accent)" onclick="show('screen-main')">Я ПРОЧИТАЛ И СОГЛАСЕН</button>
-    </div>
-
-    <div id="screen-loading" class="screen" style="text-align:center; padding-top: 50px;">
-        <div style="font-size:40px; animation: spin 1s infinite linear; width:40px; height:40px; border:4px solid #333; border-top-color:var(--accent); border-radius:50%; margin:0 auto 20px;"></div>
-        <h3>ПРОВЕРКА ПО БАЗАМ...</h3>
-        <p style="color:#888; font-size:12px">Соединение с серверами ГИБДД / КНР</p>
-    </div>
-
-    <div id="screen-result" class="screen">
-        <h2 style="color:var(--success)">ОТЧЕТ СФОРМИРОВАН!</h2>
-        <div style="background:var(--card); padding:20px; border-radius:12px; margin-bottom: 20px;">
-            <p style="display:flex; justify-content:space-between; margin:10px 0;"><span>VIN:</span> <b id="res-vin">-</b></p>
-            <p style="display:flex; justify-content:space-between; margin:10px 0;"><span>Тариф:</span> <b id="res-tariff">-</b></p>
-            <div style="height:1px; background:#333; margin:10px 0;"></div>
-            <p style="display:flex; justify-content:space-between; margin:10px 0; color:var(--success); font-size:18px;"><span>К ОПЛАТЕ:</span> <b id="res-price">-</b></p>
-        </div>
-        <button class="price-btn" onclick="pay()">ОПЛАТИТЬ И ПОЛУЧИТЬ</button>
-        <p style="text-align:center; font-size:11px; color:#
-
+        /* Галочка */
+        .checkbox-container {
+            display: flex;
