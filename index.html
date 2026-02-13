@@ -15,7 +15,7 @@
         .tab { flex: 1; padding: 15px; background: #1c1c1e; border-radius: 12px; text-align: center; cursor: pointer; border: 2px solid transparent; color: #888; }
         .tab.active-rf { border-color: #007aff; color: #fff; }
         .tab.active-cn { border-color: #ff3b30; color: #fff; }
-        .item { background: #1c1c1e; padding: 15px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #333; cursor: pointer; transition: 0.3s; }
+        .item { background: #1c1c1e; padding: 15px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #333; cursor: pointer; }
         .item.selected { border-color: #34c759; background: #1e2a1e; }
         .item b { display: block; font-size: 16px; }
         .item span { font-size: 12px; color: #888; }
@@ -23,13 +23,30 @@
         input { width: 100%; padding: 18px; background: #1c1c1e; border: 1px solid #333; border-radius: 12px; color: #fff; font-size: 18px; text-align: center; margin: 15px 0; box-sizing: border-box; }
         .check-row { display: flex; gap: 10px; font-size: 12px; color: #888; margin-bottom: 20px; align-items: flex-start; }
         .check-row input { width: 22px; height: 22px; margin: 0; flex-shrink: 0; }
-        .check-row a { color: #007aff; text-decoration: none; }
+        .check-row a { color: #007aff; text-decoration: underline; cursor: pointer; }
         .btn { width: 100%; padding: 20px; border-radius: 14px; border: none; font-weight: bold; font-size: 16px; cursor: pointer; text-transform: uppercase; background: #34c759; color: #fff; }
         .loader { border: 4px solid #333; border-top: 4px solid #34c759; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 100px auto 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* ОКНО ОФЕРТЫ */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); }
+        .modal-content { background: #1c1c1e; margin: 10% auto; padding: 20px; border-radius: 15px; width: 85%; max-height: 70vh; overflow-y: auto; border: 1px solid #333; }
     </style>
 </head>
 <body>
+
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <h3>Оферта и правила</h3>
+        <p id="oferta-text">
+            <b>1. Предмет соглашения:</b> Сервис предоставляет данные об истории ТС из открытых и закрытых источников.<br><br>
+            <b>2. Оплата:</b> Платеж является окончательным. Отчет формируется сразу после подтверждения транзакции.<br><br>
+            <b>3. Ответственность:</b> SPARK AUTO не несет ответственности за неточности в базах госорганов.<br><br>
+            <b>4. Конфиденциальность:</b> Ваши данные защищены.
+        </p>
+        <button class="btn" onclick="document.getElementById('modal').style.display='none'">ПОНЯТНО</button>
+    </div>
+</div>
 
 <div class="app">
     <div id="s-main" class="screen active">
@@ -69,7 +86,7 @@
 
         <div class="check-row">
             <input type="checkbox" id="agreed">
-            <span>Я подтверждаю ознакомление с <a href="#" onclick="alert('Тут будет текст вашей оферты: ответственность, сроки и т.д.')">офертой</a>. Вся ответственность за использование данных лежит на мне.</span>
+            <span>Я принимаю условия <a onclick="document.getElementById('modal').style.display='block'">оферты</a></span>
         </div>
 
         <button class="btn" onclick="runSearch()">ЗАПУСТИТЬ ПРОВЕРКУ</button>
@@ -86,7 +103,7 @@
             <p>Объект: <b id="res-vin"></b></p>
             <p>Тариф: <b id="res-tariff"></b></p>
             <hr style="border:0; border-top:1px solid #333; margin:15px 0;">
-            <p style="font-size:20px">К оплате: <b id="res-price"></b><b>₽</b></p>
+            <p style="font-size:20px">К оплате: <b id="res-price"></b> ₽</p>
         </div>
         <button class="btn" onclick="sendPay()">ОПЛАТИТЬ И ПОЛУЧИТЬ</button>
     </div>
@@ -94,8 +111,7 @@
 
 <script>
     const tg = window.Telegram.WebApp;
-    tg.expand(); // Раскрываем приложение на весь экран
-
+    tg.expand();
     const HOOK_URL = "https://hook.eu1.make.com/9ddudragp3yeyhrv5ko1yi26e80wjca0";
     let curPrice = "99", curTariff = "Spark Base";
 
@@ -104,9 +120,8 @@
         document.getElementById('t-cn').className = c==='CN' ? 'tab active-cn' : 'tab';
         document.getElementById('group-rf').style.display = c==='RF' ? 'block' : 'none';
         document.getElementById('group-cn').style.display = c==='CN' ? 'block' : 'none';
-        
-        if(c === 'RF') { setPrice(document.querySelector('#group-rf .item'), '99', 'Spark Base'); }
-        else { setPrice(document.querySelector('#group-cn .item'), '490', 'China Lite'); }
+        if(c==='RF') setPrice(document.querySelector('#group-rf .item'), '99', 'Spark Base');
+        else setPrice(document.querySelector('#group-cn .item'), '490', 'China Lite');
     }
 
     function setPrice(el, p, t) {
@@ -116,28 +131,23 @@
     }
 
     function runSearch() {
-        const vinVal = document.getElementById('vin').value;
-        if(!document.getElementById('agreed').checked) return alert("Нужно принять оферту!");
-        if(vinVal.length < 5) return alert("Введите VIN!");
-
-        document.getElementById('res-vin').innerText = vinVal;
+        if(!document.getElementById('agreed').checked) return alert("Примите оферту!");
+        const v = document.getElementById('vin').value;
+        if(v.length < 5) return alert("Введите VIN!");
+        
+        document.getElementById('res-vin').innerText = v;
         document.getElementById('res-tariff').innerText = curTariff;
         document.getElementById('res-price').innerText = curPrice;
-
+        
         document.getElementById('s-main').classList.remove('active');
         document.getElementById('s-load').classList.add('active');
-
         setTimeout(() => {
             document.getElementById('s-load').classList.remove('active');
             document.getElementById('s-res').classList.add('active');
-        }, 2500);
+        }, 2000);
     }
 
     function sendPay() {
-        // Автоматически берем данные пользователя из Telegram
-        const user = tg.initDataUnsafe?.user;
-        const userId = user ? user.id : "unknown";
-
         fetch(HOOK_URL, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
@@ -146,13 +156,11 @@
                 vin: document.getElementById('res-vin').innerText, 
                 price: curPrice, 
                 tariff: curTariff,
-                telegram_id: userId
+                telegram_id: tg.initDataUnsafe?.user?.id || "no_id"
             })
         });
-        alert("Запрос отправлен! Закройте приложение и проверьте чат с ботом.");
-        tg.close(); // Закрываем WebApp после нажатия
+        tg.close();
     }
 </script>
-
 </body>
 </html>
