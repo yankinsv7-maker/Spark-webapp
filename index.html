@@ -10,38 +10,37 @@
             --bg: #0c0c0e; --card: #1c1c1e; --accent: #007aff; --accent-cn: #ff3b30;
             --text: #ffffff; --text-dim: #8e8e93; --success: #34c759;
         }
-        body { background-color: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
-        .screen { display: none; width: 100%; max-width: 360px; animation: fadeIn 0.3s ease; }
-        .active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        body { background-color: var(--bg); color: var(--text); font-family: -apple-system, system-ui, sans-serif; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         
-        h2 { font-size: 20px; text-align: center; margin-bottom: 5px; font-weight: 900; letter-spacing: -0.5px; }
-        .subtitle { color: var(--text-dim); font-size: 10px; text-align: center; margin-bottom: 20px; letter-spacing: 1px; }
-
-        .selector { display: flex; gap: 8px; margin-bottom: 15px; width: 100%; }
-        .type-card { flex: 1; background: var(--card); padding: 12px; border-radius: 12px; text-align: center; border: 2px solid transparent; cursor: pointer; transition: 0.2s; font-weight: bold; font-size: 14px; }
-        .type-card.selected-rf { border-color: var(--accent); background: rgba(0,122,255,0.1); }
-        .type-card.selected-cn { border-color: var(--accent-cn); background: rgba(255,59,48,0.1); }
-
-        .price-grid { display: flex; flex-direction: column; gap: 10px; width: 100%; }
-        .price-item { background: var(--card); padding: 15px; border-radius: 14px; border: 1px solid #2c2c2e; position: relative; transition: 0.2s; }
-        .price-item.selected { border-color: var(--success); background: rgba(52,199,89,0.05); }
-        .price-info b { font-size: 15px; display: block; margin-bottom: 4px; color: var(--success); }
-        .price-info span { font-size: 11px; color: var(--text-dim); display: block; }
-        .price-tag { position: absolute; top: 15px; right: 15px; font-weight: 900; font-size: 18px; }
-
-        .arrow-btn { background: none; border: none; color: var(--accent); cursor: pointer; font-size: 10px; padding: 8px 0 0; display: flex; align-items: center; gap: 5px; text-transform: uppercase; font-weight: bold; margin-top: 10px; border-top: 1px solid #2c2c2e; width: 100%; }
-        .details { display: none; padding: 10px 0 0; font-size: 12px; color: var(--text-dim); line-height: 1.4; animation: slideDown 0.3s ease; }
-        .details.show { display: block; }
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
-
-        .input-box { width: 100%; background: var(--card); border-radius: 14px; padding: 16px; margin: 20px 0 10px; box-sizing: border-box; border: 1px solid #333; font-size: 18px; color: white; text-align: center; font-weight: bold; text-transform: uppercase; }
-        .agreement { font-size: 10px; color: var(--text-dim); text-align: center; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .screen { display: none; width: 100%; max-width: 400px; }
+        .active { display: block !important; }
         
-        .price-btn { width: 100%; background: var(--success); color: white; border: none; padding: 18px; border-radius: 16px; font-weight: 800; font-size: 16px; cursor: pointer; box-shadow: 0 4px 15px rgba(52,199,89,0.3); }
+        h2 { font-size: 22px; text-align: center; margin: 10px 0 5px 0; font-weight: 800; }
+        .subtitle { color: var(--text-dim); font-size: 10px; text-align: center; margin-bottom: 20px; letter-spacing: 1px; text-transform: uppercase; }
+
+        .selector { display: flex; gap: 10px; margin-bottom: 15px; width: 100%; }
+        .type-card { flex: 1; background: var(--card); padding: 12px; border-radius: 12px; text-align: center; border: 2px solid transparent; cursor: pointer; transition: 0.2s; }
+        .type-card.selected-rf { border-color: var(--accent); background: rgba(0,122,255,0.15); }
+        .type-card.selected-cn { border-color: var(--accent-cn); background: rgba(255,59,48,0.15); }
+        .base-list { font-size: 8px; color: #666; margin-top: 5px; line-height: 1.1; }
+
+        .price-grid { display: block; width: 100%; margin-top: 10px; }
+        .price-item { background: var(--card); padding: 12px 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #2c2c2e; margin-bottom: 8px; cursor: pointer; }
+        .price-item.selected { border-color: var(--success); background: rgba(52,199,89,0.1); }
+        .price-info b { display: block; font-size: 14px; margin-bottom: 2px; }
+        .price-info span { font-size: 11px; color: var(--text-dim); }
+        .price-tag { color: var(--success); font-weight: 700; font-size: 16px; }
+
+        .input-box { width: 100%; background: var(--card); border-radius: 12px; padding: 15px; margin: 15px 0; box-sizing: border-box; border: 1px solid #333; font-size: 16px; color: white; text-align: center; outline: none; }
+        .agreement { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; font-size: 11px; color: var(--text-dim); width: 100%; }
+        .agreement b { color: var(--accent); text-decoration: underline; }
         
-        .loader { border: 4px solid #333; border-top: 4px solid var(--accent); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 15px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .loader { width: 40px; height: 40px; border: 3px solid #333; border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; margin: 50px auto 20px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .status-line { font-size: 13px; color: var(--text-dim); margin: 10px 0; text-align: center; }
+
+        .price-btn { width: 100%; background: var(--success); color: white; border: none; padding: 16px; border-radius: 12px; font-weight: 700; font-size: 16px; margin-top: 10px; cursor: pointer; }
+        #legal-text { font-size: 12px; color: #ccc; line-height: 1.4; height: 300px; overflow-y: auto; padding: 10px; background: #000; border-radius: 8px; }
     </style>
 </head>
 <body>
@@ -51,11 +50,159 @@
         <div class="subtitle">ПРОВЕРКА ПО ВСЕМ БАЗАМ РФ И КИТАЯ</div>
 
         <div class="selector">
-            <div id="card-rf" class="type-card selected-rf" onclick="setType('RF')">🇷🇺 РФ</div>
-            <div id="card-cn" class="type-card" onclick="setType('CN')">🇨🇳 КИТАЙ</div>
+            <div id="card-rf" class="type-card selected-rf" onclick="setType('RF')">
+                <span style="font-size: 20px;">🇷🇺 РФ</span><br>
+                <div class="base-list">ГИБДД • ФНП • РСА</div>
+            </div>
+            <div id="card-cn" class="type-card" onclick="setType('CN')">
+                <span style="font-size: 20px;">🇨🇳 КИТАЙ</span><br>
+                <div class="base-list">C-ASAM • CBX • ЭКСПОРТ</div>
+            </div>
         </div>
 
-        <div id="price-container" class="price-grid"></div>
+        <div id="prices-rf" class="price-grid">
+            <div class="price-item selected" onclick="selectPrice(this, '199₽', 'Краткий отчет')">
+                <div class="price-info"><b>Краткий отчет</b><span>Угон и залоги</span></div>
+                <div class="price-tag">199₽</div>
+            </div>
+            <div class="price-item" onclick="selectPrice(this, '399₽', 'Полная история')">
+                <div class="price-info"><b>Полная история</b><span>ДТП, пробеги, такси</span></div>
+                <div class="price-tag">399₽</div>
+            </div>
+        </div>
 
-        <input type="text" id="
+        <div id="prices-cn" class="price-grid" style="display:none">
+            <div class="price-item selected" onclick="selectPrice(this, '990₽', 'Тех-лист КНР')">
+                <div class="price-info"><b>Тех-лист КНР</b><span>Параметры и вывоз</span></div>
+                <div class="price-tag">990₽</div>
+            </div>
+            <div class="price-item" onclick="selectPrice(this, '2490₽', 'История обслуживания')">
+                <div class="price-info"><b>История в КНР</b><span>Ремонты и дилеры</span></div>
+                <div class="price-tag">2490₽</div>
+            </div>
+        </div>
 
+        <input type="text" id="vin-input" class="input-box" placeholder="ВВЕДИТЕ VIN">
+        
+        <div class="agreement">
+            <input type="checkbox" id="check-legal" checked>
+            <span>Я согласен с <b onclick="showScreen('screen-legal')">правилами сервиса</b></span>
+        </div>
+    </div>
+
+    <div id="screen-legal" class="screen">
+        <h2>ПРАВИЛА</h2>
+        <div id="legal-text">
+            <p>Сервис Spark Auto предоставляет данные из открытых источников РФ и КНР.</p>
+            <p>Оплата производится за генерацию информационного отчета.</p>
+        </div>
+        <button class="price-btn" style="background: var(--accent);" onclick="showScreen('screen-main')">НАЗАД</button>
+    </div>
+
+    <div id="screen-loading" class="screen">
+        <div class="loader"></div>
+        <h2 id="load-title">АНАЛИЗ ДАННЫХ</h2>
+        <div class="status-line" id="s1">● Подключение к шлюзу...</div>
+        <div class="status-line" id="s2" style="opacity:0.3">● Проверка ограничений...</div>
+    </div>
+
+    <div id="screen-result" class="screen">
+        <h2 style="color: var(--success);">ГОТОВО!</h2>
+        <div style="background:var(--card); padding:20px; border-radius:12px; margin: 15px 0;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:10px"><span>VIN:</span><b id="res-vin">-</b></div>
+            <div style="display:flex; justify-content:space-between; color:var(--success)"><span>К оплате:</span><b id="res-price">199₽</b></div>
+        </div>
+        <button class="price-btn" onclick="startPay()">ОПЛАТИТЬ ОТЧЕТ</button>
+    </div>
+
+    <script>
+        var tg = window.Telegram.WebApp;
+        tg.expand();
+        var currentType = 'RF';
+        var currentPrice = '199₽';
+        var currentTariff = 'Краткий отчет';
+        var makeUrl = "https://hook.eu1.make.com/deve7mhscs6nxy86x4dbxknph4e3jp4z";
+
+        // Показываем кнопку ТГ сразу
+        tg.MainButton.setText("ЗАПУСТИТЬ ПРОВЕРКУ").show();
+
+        function setType(type) {
+            currentType = type;
+            document.getElementById('card-rf').className = (type === 'RF') ? 'type-card selected-rf' : 'type-card';
+            document.getElementById('card-cn').className = (type === 'CN') ? 'type-card selected-cn' : 'type-card';
+            document.getElementById('prices-rf').style.display = (type === 'RF') ? 'block' : 'none';
+            document.getElementById('prices-cn').style.display = (type === 'CN') ? 'block' : 'none';
+            
+            if(type === 'RF') {
+                currentPrice = '199₽'; currentTariff = 'Краткий отчет';
+            } else {
+                currentPrice = '990₽'; currentTariff = 'Тех-лист КНР';
+            }
+            tg.MainButton.setParams({color: (type === 'RF' ? '#007aff' : '#ff3b30')});
+        }
+
+        function selectPrice(el, price, name) {
+            var items = document.querySelectorAll('.price-item');
+            for(var i=0; i<items.length; i++) items[i].classList.remove('selected');
+            el.classList.add('selected');
+            currentPrice = price;
+            currentTariff = name;
+        }
+
+        function showScreen(id) {
+            var screens = document.querySelectorAll('.screen');
+            for(var i=0; i<screens.length; i++) screens[i].classList.remove('active');
+            document.getElementById(id).classList.add('active');
+            if(id === 'screen-main') tg.MainButton.show(); else tg.MainButton.hide();
+        }
+
+        tg.MainButton.onClick(function() {
+            var vin = document.getElementById('vin-input').value;
+            if(!document.getElementById('check-legal').checked) {
+                tg.showAlert("Примите правила!");
+                return;
+            }
+            if(vin.length < 5) {
+                tg.showAlert("Введите VIN!");
+                return;
+            }
+
+            document.getElementById('res-vin').innerText = vin;
+            document.getElementById('res-price').innerText = currentPrice;
+            showScreen('screen-loading');
+
+            setTimeout(function(){ document.getElementById('s2').style.opacity = 1; }, 2000);
+            setTimeout(function(){ showScreen('screen-result'); }, 4000);
+
+            fetch(makeUrl, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ 
+                    vin: vin, 
+                    type: currentType, 
+                    price: currentPrice, 
+                    tariff: currentTariff,
+                    user: tg.initDataUnsafe.user, 
+                    status: 'search_started' 
+                })
+            });
+        });
+
+        function startPay() {
+            fetch(makeUrl, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ 
+                    vin: document.getElementById('res-vin').innerText, 
+                    price: currentPrice, 
+                    tariff: currentTariff,
+                    user: tg.initDataUnsafe.user, 
+                    status: 'pay_clicked' 
+                })
+            });
+            tg.showAlert("Запрос отправлен! Бот пришлет счет в чат.");
+            setTimeout(function(){ tg.close(); }, 2000);
+        }
+    </script>
+</body>
+</html>
