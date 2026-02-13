@@ -9,27 +9,20 @@
         .app { width: 100%; max-width: 400px; }
         .screen { display: none; }
         .active { display: block; }
-        
         h2 { text-align: center; font-size: 24px; margin: 10px 0 20px; }
-        
         .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
         .tab { flex: 1; padding: 15px; background: #1c1c1e; border-radius: 12px; text-align: center; cursor: pointer; border: 2px solid transparent; color: #888; }
         .tab.active-rf { border-color: #007aff; color: #fff; }
         .tab.active-cn { border-color: #ff3b30; color: #fff; }
-
         .item { background: #1c1c1e; padding: 15px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #333; cursor: pointer; }
         .item.selected { border-color: #34c759; background: #1e2a1e; }
         .item b { display: block; font-size: 16px; }
         .item span { font-size: 12px; color: #888; }
         .price { color: #34c759; font-weight: bold; font-size: 18px; }
-
         input { width: 100%; padding: 18px; background: #1c1c1e; border: 1px solid #333; border-radius: 12px; color: #fff; font-size: 18px; text-align: center; margin: 15px 0; box-sizing: border-box; }
-        
         .check-row { display: flex; gap: 10px; font-size: 12px; color: #888; margin-bottom: 20px; align-items: flex-start; }
         .check-row input { width: 24px; height: 24px; margin: 0; flex-shrink: 0; }
-
         .btn { width: 100%; padding: 20px; border-radius: 14px; border: none; font-weight: bold; font-size: 16px; cursor: pointer; text-transform: uppercase; background: #34c759; color: #fff; }
-        
         .loader { border: 4px solid #333; border-top: 4px solid #34c759; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 100px auto 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
@@ -98,7 +91,9 @@
 </div>
 
 <script>
-    const HOOK_URL = "https://hook.eu1.make.com/deve7mhscs6nxy86x4dbxknph4e3jp4z";
+    // ТВОЙ НОВЫЙ ВЕБХУК ТУТ:
+    const HOOK_URL = "https://hook.eu1.make.com/9ddudragp3yeyhrv5ko1yi26e80wjca0";
+    
     let curPrice = "99₽", curTariff = "Spark Base", curCountry = "RF";
 
     function setTab(c) {
@@ -108,7 +103,6 @@
         document.getElementById('group-rf').style.display = c==='RF' ? 'block' : 'none';
         document.getElementById('group-cn').style.display = c==='CN' ? 'block' : 'none';
         
-        // Сброс выбора
         document.querySelectorAll('.item').forEach(i => i.classList.remove('selected'));
         if(c === 'RF') {
             curPrice = "99₽"; curTariff = "Spark Base";
@@ -137,7 +131,6 @@
         document.getElementById('s-main').classList.remove('active');
         document.getElementById('s-load').classList.add('active');
 
-        // Отправка в Make
         fetch(HOOK_URL, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
@@ -154,9 +147,9 @@
         fetch(HOOK_URL, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ action: 'pay', vin: document.getElementById('res-vin').innerText, price: curPrice })
+            body: JSON.stringify({ action: 'pay', vin: document.getElementById('res-vin').innerText, price: curPrice, tariff: document.getElementById('res-tariff').innerText })
         });
-        alert("Запрос на оплату отправлен!");
+        alert("Запрос на оплату отправлен в Telegram!");
     }
 </script>
 
