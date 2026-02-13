@@ -3,47 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Spark Auto</title>
+    <title>Spark Auto Test</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
             background-color: #0c0c0e;
             color: #ffffff;
-            font-family: sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             margin: 0;
             padding: 20px;
             display: flex;
             flex-direction: column;
-            min-height: 100vh;
+            align-items: center;
         }
 
-        /* Стили карточек и кнопок */
-        .card {
-            background: #1c1c1e;
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 10px;
-            border: 1px solid #333;
-        }
-
-        .btn-main {
-            width: 100%;
-            padding: 18px;
-            background-color: #34c759; /* Зеленый */
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 20px;
-            text-transform: uppercase;
-        }
-
-        .btn-main:active { opacity: 0.8; transform: scale(0.98); }
+        .container { width: 100%; max-width: 400px; }
+        
+        h2 { text-align: center; font-weight: 800; letter-spacing: 1px; margin-bottom: 20px; }
 
         /* Переключатель стран */
-        .selector { display: flex; gap: 10px; margin-bottom: 20px; }
+        .selector { display: flex; gap: 10px; margin-bottom: 20px; width: 100%; }
         .type-btn {
             flex: 1;
             padding: 15px;
@@ -51,42 +30,253 @@
             border: 2px solid transparent;
             border-radius: 12px;
             text-align: center;
-            color: #888;
-            font-weight: bold;
             cursor: pointer;
+            font-weight: bold;
+            color: #8e8e93;
+            transition: 0.2s;
         }
         .type-btn.active-rf { border-color: #007aff; color: #fff; background: rgba(0,122,255,0.1); }
         .type-btn.active-cn { border-color: #ff3b30; color: #fff; background: rgba(255,59,48,0.1); }
 
         /* Тарифы */
-        .price-row {
+        .price-card {
+            background: #1c1c1e;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px;
-            margin-bottom: 8px;
-            background: #2c2c2e;
-            border-radius: 8px;
-            border: 1px solid transparent;
+            border: 1px solid #2c2c2e;
             cursor: pointer;
+            transition: 0.2s;
         }
-        .price-row.selected { border-color: #34c759; background: rgba(52,199,89,0.1); }
-        
-        /* Поля ввода */
+        .price-card.selected { border-color: #34c759; background: rgba(52,199,89,0.05); }
+        .price-info b { display: block; font-size: 15px; }
+        .price-info span { font-size: 11px; color: #8e8e93; }
+        .price-val { color: #34c759; font-weight: 800; font-size: 17px; }
+
+        /* Поле ввода */
         input[type="text"] {
             width: 100%;
-            padding: 15px;
-            border-radius: 12px;
-            border: 1px solid #444;
+            padding: 16px;
             background: #1c1c1e;
-            color: white;
-            font-size: 18px;
+            border: 1px solid #333;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 16px;
             text-align: center;
+            margin: 15px 0;
             box-sizing: border-box;
             outline: none;
-            text-transform: uppercase;
         }
 
-        /* Галочка */
-        .checkbox-container {
+        /* Чекбокс оферты */
+        .legal-box {
             display: flex;
+            gap: 10px;
+            font-size: 12px;
+            color: #8e8e93;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+        .legal-box input { width: 22px; height: 22px; cursor: pointer; }
+
+        /* Кнопки */
+        .btn-action {
+            width: 100%;
+            padding: 18px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 800;
+            font-size: 16px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+        .btn-green { background: #34c759; color: #fff; }
+        .btn-blue { background: #007aff; color: #fff; margin-top: 10px; }
+
+        /* Экраны */
+        .screen { display: none; width: 100%; }
+        .screen.active { display: block; }
+
+        /* Лоадер */
+        .loader {
+            border: 4px solid #1c1c1e;
+            border-top: 4px solid #34c759;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 50px auto 20px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <div id="screen-main" class="screen active">
+            <h2>SPARK AUTO</h2>
+
+            <div class="selector">
+                <div id="tab-rf" class="type-btn active-rf" onclick="changeCountry('RF')">🇷🇺 РФ</div>
+                <div id="tab-cn" class="type-btn" onclick="changeCountry('CN')">🇨🇳 КИТАЙ</div>
+            </div>
+
+            <div id="box-rf">
+                <div class="price-card selected" onclick="pickPrice(this, '99₽', 'Spark Base')">
+                    <div class="price-info"><b>Spark Base</b><span>Угон, залоги, аресты</span></div>
+                    <div class="price-val">99₽</div>
+                </div>
+                <div class="price-card" onclick="pickPrice(this, '199₽', 'Spark Standard')">
+                    <div class="price-info"><b>Spark Standard</b><span>База + Пробеги и Владельцы</span></div>
+                    <div class="price-val">199₽</div>
+                </div>
+                <div class="price-card" onclick="pickPrice(this, '299₽', 'Spark Full')">
+                    <div class="price-info"><b>Spark Full</b><span>ДТП, Ремонты, Такси, Фото</span></div>
+                    <div class="price-val">299₽</div>
+                </div>
+            </div>
+
+            <div id="box-cn" style="display:none">
+                <div class="price-card" onclick="pickPrice(this, '490₽', 'China Lite')">
+                    <div class="price-info"><b>China Lite</b><span>Тех-параметры и Экспорт</span></div>
+                    <div class="price-val">490₽</div>
+                </div>
+                <div class="price-card" onclick="pickPrice(this, '1490₽', 'China Full')">
+                    <div class="price-info"><b>China Full</b><span>История обслуживания в КНР</span></div>
+                    <div class="price-val">1490₽</div>
+                </div>
+            </div>
+
+            <input type="text" id="vin-field" placeholder="ВВЕДИТЕ VIN / НОМЕР">
+
+            <div class="legal-box">
+                <input type="checkbox" id="check-box">
+                <div>Я подтверждаю согласие с <u>офертой</u>. Я осознаю, что вся ответственность за использование данных лежит на мне.</div>
+            </div>
+
+            <button class="btn-action btn-green" onclick="handleStart()">ЗАПУСТИТЬ ПРОВЕРКУ</button>
+        </div>
+
+        <div id="screen-loading" class="screen">
+            <div class="loader"></div>
+            <h3 style="text-align:center">АНАЛИЗ ДАННЫХ...</h3>
+            <p style="text-align:center; color:#8e8e93">Опрашиваем базы ГИБДД и реестры...</p>
+        </div>
+
+        <div id="screen-result" class="screen">
+            <h2 style="color:#34c759">ОТЧЕТ ГОТОВ!</h2>
+            <div style="background:#1c1c1e; padding:20px; border-radius:12px; border:1px solid #333">
+                <p style="display:flex; justify-content:space-between"><span>VIN:</span> <b id="out-vin">-</b></p>
+                <p style="display:flex; justify-content:space-between"><span>Тариф:</span> <b id="out-tariff">-</b></p>
+                <p style="display:flex; justify-content:space-between; color:#34c759; font-size:20px; margin-top:15px; border-top:1px solid #333; pt:15px"><span>ИТОГО:</span> <b id="out-price">-</b></p>
+            </div>
+            <button class="btn-action btn-green" style="margin-top:20px" onclick="handlePay()">ОПЛАТИТЬ И ПОЛУЧИТЬ</button>
+            <button class="btn-action btn-blue" onclick="location.reload()">НАЗАД</button>
+        </div>
+
+    </div>
+
+    <script>
+        // Инициализация (если в ТГ)
+        let tg = window.Telegram ? window.Telegram.WebApp : null;
+        if (tg) tg.expand();
+
+        let currentCountry = 'RF';
+        let currentPrice = '99₽';
+        let currentTariff = 'Spark Base';
+        const WEBHOOK = "https://hook.eu1.make.com/deve7mhscs6nxy86x4dbxknph4e3jp4z";
+
+        function changeCountry(c) {
+            currentCountry = c;
+            document.getElementById('tab-rf').className = c === 'RF' ? 'type-btn active-rf' : 'type-btn';
+            document.getElementById('tab-cn').className = c === 'CN' ? 'type-btn active-cn' : 'type-btn';
+            
+            document.getElementById('box-rf').style.display = c === 'RF' ? 'block' : 'none';
+            document.getElementById('box-cn').style.display = c === 'CN' ? 'block' : 'none';
+
+            // Автовыбор первой цены
+            let firstPrice = c === 'RF' ? '99₽' : '490₽';
+            let firstTariff = c === 'RF' ? 'Spark Base' : 'China Lite';
+            
+            document.querySelectorAll('.price-card').forEach(card => card.classList.remove('selected'));
+            let targetBox = c === 'RF' ? '#box-rf' : '#box-cn';
+            document.querySelector(targetBox + ' .price-card').classList.add('selected');
+            
+            currentPrice = firstPrice;
+            currentTariff = firstTariff;
+        }
+
+        function pickPrice(el, p, t) {
+            document.querySelectorAll('.price-card').forEach(card => card.classList.remove('selected'));
+            el.classList.add('selected');
+            currentPrice = p;
+            currentTariff = t;
+        }
+
+        function handleStart() {
+            const vin = document.getElementById('vin-field').value;
+            const agree = document.getElementById('check-box').checked;
+
+            if (!agree) {
+                alert("Нужно подтвердить согласие с офертой!");
+                return;
+            }
+            if (vin.length < 5) {
+                alert("Введите VIN номер!");
+                return;
+            }
+
+            // Данные для финала
+            document.getElementById('out-vin').innerText = vin;
+            document.getElementById('out-tariff').innerText = currentTariff;
+            document.getElementById('out-price').innerText = currentPrice;
+
+            // Переход на загрузку
+            document.getElementById('screen-main').classList.remove('active');
+            document.getElementById('screen-loading').classList.add('active');
+
+            // Отправка в Make
+            fetch(WEBHOOK, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    status: 'start',
+                    vin: vin,
+                    tariff: currentTariff,
+                    price: currentPrice,
+                    user: tg ? tg.initDataUnsafe.user : 'web-test'
+                })
+            }).catch(e => console.log("Make error (ignore if testing):", e));
+
+            // Через 3 сек показываем результат
+            setTimeout(() => {
+                document.getElementById('screen-loading').classList.remove('active');
+                document.getElementById('screen-result').classList.add('active');
+            }, 3000);
+        }
+
+        function handlePay() {
+            const vin = document.getElementById('out-vin').innerText;
+            
+            fetch(WEBHOOK, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    status: 'pay_click',
+                    vin: vin,
+                    tariff: currentTariff,
+                    price: currentPrice,
+                    user: tg ? tg.initDataUnsafe.user : 'web-test'
+                })
+            });
+
+            alert("Запрос на оплату " + currentPrice + " отправлен!");
+            if (tg) tg.close();
+        }
+    </script>
+</body>
+</html>
