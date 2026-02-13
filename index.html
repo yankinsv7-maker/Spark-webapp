@@ -1,34 +1,53 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Spark Auto Check</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root { --bg: #0c0c0e; --card: #1c1c1e; --accent: #007aff; --success: #34c759; --text: #fff; }
-        body { background: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
-        .screen { display: none; width: 100%; max-width: 400px; }
-        .active { display: block !important; }
-        h2 { text-align: center; margin-bottom: 20px; font-size: 22px; font-weight: 800; }
+        :root { --bg: #0c0c0e; --card: #1c1c1e; --accent: #007aff; --success: #34c759; --text: #ffffff; --err: #ff3b30; }
+        body { background-color: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; padding: 15px; display: flex; flex-direction: column; min-height: 100vh; }
         
-        .selector { display: flex; gap: 10px; margin-bottom: 20px; width: 100%; }
+        /* Экраны */
+        .screen { display: none; width: 100%; animation: fadeIn 0.3s; }
+        .active { display: block !important; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        h2 { text-align: center; margin: 10px 0 20px; font-weight: 800; font-size: 22px; }
+
+        /* Переключатель стран */
+        .selector { display: flex; gap: 10px; margin-bottom: 20px; }
         .type-card { flex: 1; background: var(--card); padding: 15px; border-radius: 12px; text-align: center; border: 2px solid transparent; cursor: pointer; transition: 0.2s; }
-        .selected-rf { border-color: var(--accent); background: rgba(0,122,255,0.1); }
-        .selected-cn { border-color: #ff3b30; background: rgba(255,59,48,0.1); }
+        .selected-rf { border-color: var(--accent); background: rgba(0,122,255,0.15); }
+        .selected-cn { border-color: #ff3b30; background: rgba(255,59,48,0.15); }
 
-        .price-item { background: var(--card); padding: 12px 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #2c2c2e; margin-bottom: 8px; cursor: pointer; }
-        .price-item.selected { border-color: var(--success); background: rgba(52,199,89,0.05); }
-        .price-tag { color: var(--success); font-weight: bold; font-size: 16px; }
+        /* Тарифы */
+        .price-item { background: var(--card); padding: 12px 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #333; margin-bottom: 8px; cursor: pointer; }
+        .price-item.selected { border-color: var(--success); background: rgba(52,199,89,0.1); }
+        .price-info b { display: block; font-size: 14px; margin-bottom: 3px; }
+        .price-info span { font-size: 11px; color: #8e8e93; }
+        .price-tag { color: var(--success); font-weight: 700; font-size: 16px; }
 
-        input { width: 100%; background: var(--card); border: 1px solid #333; padding: 15px; border-radius: 12px; color: #fff; text-align: center; margin: 15px 0; box-sizing: border-box; outline: none; font-size: 16px; }
-        .price-btn { width: 100%; background: var(--success); color: #fff; border: none; padding: 18px; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 16px; }
-        .small-txt { color: #8e8e93; font-size: 11px; margin-top: 4px; display: block; }
+        /* Ввод и Галочка */
+        input[type="text"] { width: 100%; background: var(--card); border: 1px solid #333; padding: 15px; border-radius: 12px; color: #fff; text-align: center; margin: 15px 0; box-sizing: border-box; outline: none; font-size: 16px; text-transform: uppercase; }
+        
+        .agreement-box { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 10px; margin-bottom: 20px; font-size: 11px; line-height: 1.4; display: flex; gap: 10px; align-items: flex-start; }
+        .agreement-box input { width: 20px; height: 20px; margin: 0; accent-color: var(--success); cursor: pointer; }
+        .agreement-text b { text-decoration: underline; color: var(--accent); cursor: pointer; }
+
+        /* Кнопки и прочее */
+        .price-btn { width: 100%; background: var(--success); color: white; border: none; padding: 16px; border-radius: 12px; font-weight: 700; font-size: 16px; cursor: pointer; margin-top: 15px; }
+        
+        /* Текст оферты */
+        #legal-full { font-size: 12px; color: #ccc; height: 300px; overflow-y: scroll; padding: 10px; background: #000; border: 1px solid #333; border-radius: 8px; line-height: 1.5; }
     </style>
 </head>
 <body>
 
     <div id="screen-main" class="screen active">
         <h2>SPARK AUTO</h2>
+
         <div class="selector">
             <div id="card-rf" class="type-card selected-rf" onclick="setType('RF')">🇷🇺 РФ</div>
             <div id="card-cn" class="type-card" onclick="setType('CN')">🇨🇳 КИТАЙ</div>
@@ -36,130 +55,65 @@
 
         <div id="prices-rf">
             <div class="price-item selected" onclick="setPrice(this, '99₽', 'Spark Base')">
-                <div><b>Spark Base</b><span class="small-txt">Угон, залоги, ограничения</span></div>
+                <div class="price-info"><b>Spark Base</b><span>Угон, залоги, аресты</span></div>
                 <div class="price-tag">99₽</div>
             </div>
             <div class="price-item" onclick="setPrice(this, '199₽', 'Spark Standard')">
-                <div><b>Spark Standard</b><span class="small-txt">Base + Пробеги и Владельцы</span></div>
+                <div class="price-info"><b>Spark Standard</b><span>Base + Пробеги и Владельцы</span></div>
                 <div class="price-tag">199₽</div>
             </div>
             <div class="price-item" onclick="setPrice(this, '299₽', 'Spark Full')">
-                <div><b>Spark Full</b><span class="small-txt">ДТП, Ремонты, Такси, Фото</span></div>
+                <div class="price-info"><b>Spark Full</b><span>ДТП, Ремонты, Такси, Фото</span></div>
                 <div class="price-tag">299₽</div>
             </div>
         </div>
 
         <div id="prices-cn" style="display:none">
             <div class="price-item" onclick="setPrice(this, '490₽', 'China Lite')">
-                <div><b>China Lite</b><span class="small-txt">Тех-параметры и Экспорт</span></div>
+                <div class="price-info"><b>China Lite</b><span>Тех-параметры и Экспорт</span></div>
                 <div class="price-tag">490₽</div>
             </div>
             <div class="price-item" onclick="setPrice(this, '1490₽', 'China Full')">
-                <div><b>China Full</b><span class="small-txt">История обслуживания в КНР</span></div>
+                <div class="price-info"><b>China Full</b><span>История обслуживания в КНР</span></div>
                 <div class="price-tag">1490₽</div>
             </div>
         </div>
 
-        <input type="text" id="vin-input" placeholder="ВВЕДИТЕ VIN">
-        <label style="font-size: 12px; color: #8e8e93; display: block; text-align: center; margin-bottom: 15px;">
-            <input type="checkbox" id="legal" checked> Я согласен с офертой
-        </label>
+        <input type="text" id="vin-input" placeholder="ВВЕДИТЕ VIN / НОМЕР">
+        
+        <div class="agreement-box">
+            <input type="checkbox" id="check-legal">
+            <div class="agreement-text">
+                Я подтверждаю, что ознакомился с <b onclick="show('screen-legal')">офертой</b>. Я осознаю, что вся ответственность за использование полученных данных лежит на мне.
+            </div>
+        </div>
     </div>
 
-    <div id="screen-loading" class="screen" style="text-align:center;">
-        <div style="margin-top:100px;">
-            <div style="font-size: 20px; margin-bottom: 20px;">АНАЛИЗ ДАННЫХ...</div>
-            <div style="color: #8e8e93;">Обращаемся к официальным базам...</div>
+    <div id="screen-legal" class="screen">
+        <h2>ОТКАЗ ОТ ОТВЕТСТВЕННОСТИ</h2>
+        <div id="legal-full">
+            <p>1. <b>Предоставление данных:</b> Сервис Spark Auto предоставляет информационные услуги на основе открытых источников (ГИБДД, ФНП, РСА, Реестры КНР).</p>
+            <p>2. <b>Ответственность клиента:</b> Нажимая кнопку "Запустить проверку", Клиент безоговорочно подтверждает, что вся ответственность за интерпретацию и использование полученных данных, а также за любые юридические действия с автомобилем, лежит исключительно на Клиенте.</p>
+            <p>3. <b>Отказ от гарантий:</b> Сервис не несет ответственности за неполноту данных в официальных государственных базах источников.</p>
+            <p>4. <b>Оплата:</b> Услуга считается оказанной в момент отправки ссылки на отчет.</p>
         </div>
+        <button class="price-btn" style="background:var(--accent)" onclick="show('screen-main')">Я ПРОЧИТАЛ И СОГЛАСЕН</button>
+    </div>
+
+    <div id="screen-loading" class="screen" style="text-align:center; padding-top: 50px;">
+        <div style="font-size:40px; animation: spin 1s infinite linear; width:40px; height:40px; border:4px solid #333; border-top-color:var(--accent); border-radius:50%; margin:0 auto 20px;"></div>
+        <h3>ПРОВЕРКА ПО БАЗАМ...</h3>
+        <p style="color:#888; font-size:12px">Соединение с серверами ГИБДД / КНР</p>
     </div>
 
     <div id="screen-result" class="screen">
-        <h2 style="color:var(--success)">ОТЧЕТ ГОТОВ!</h2>
+        <h2 style="color:var(--success)">ОТЧЕТ СФОРМИРОВАН!</h2>
         <div style="background:var(--card); padding:20px; border-radius:12px; margin-bottom: 20px;">
-            <p style="display:flex; justify-content:space-between; margin: 10px 0;">Объект: <b id="res-vin"></b></p>
-            <p style="display:flex; justify-content:space-between; margin: 10px 0;">Тариф: <b id="res-tariff"></b></p>
-            <p style="display:flex; justify-content:space-between; margin: 10px 0; color:var(--success)">Цена: <b id="res-price"></b></p>
+            <p style="display:flex; justify-content:space-between; margin:10px 0;"><span>VIN:</span> <b id="res-vin">-</b></p>
+            <p style="display:flex; justify-content:space-between; margin:10px 0;"><span>Тариф:</span> <b id="res-tariff">-</b></p>
+            <div style="height:1px; background:#333; margin:10px 0;"></div>
+            <p style="display:flex; justify-content:space-between; margin:10px 0; color:var(--success); font-size:18px;"><span>К ОПЛАТЕ:</span> <b id="res-price">-</b></p>
         </div>
         <button class="price-btn" onclick="pay()">ОПЛАТИТЬ И ПОЛУЧИТЬ</button>
-    </div>
+        <p style="text-align:center; font-size:11px; color:#
 
-    <script>
-        let tg = window.Telegram.WebApp;
-        tg.expand();
-        let curType = 'RF', curPrice = '99₽', curTariff = 'Spark Base';
-        let makeUrl = "https://hook.eu1.make.com/deve7mhscs6nxy86x4dbxknph4e3jp4z";
-
-        tg.MainButton.setText("ЗАПУСТИТЬ ПРОВЕРКУ").show().onClick(() => {
-            let vin = document.getElementById('vin-input').value;
-            if(vin.length < 5) return tg.showAlert("Введите корректный VIN");
-            
-            document.getElementById('res-vin').innerText = vin;
-            document.getElementById('res-tariff').innerText = curTariff;
-            document.getElementById('res-price').innerText = curPrice;
-            
-            show('screen-loading');
-            
-            fetch(makeUrl, { 
-                method:'POST', 
-                headers:{'Content-Type':'application/json'}, 
-                body:JSON.stringify({
-                    vin: vin, 
-                    type: curType, 
-                    price: curPrice, 
-                    tariff: curTariff, 
-                    user: tg.initDataUnsafe.user, 
-                    status: 'search_started'
-                }) 
-            });
-            
-            setTimeout(() => show('screen-result'), 3500);
-        });
-
-        function setType(t) {
-            curType = t;
-            document.getElementById('card-rf').className = t=='RF'?'type-card selected-rf':'type-card';
-            document.getElementById('card-cn').className = t=='CN'?'type-card selected-cn':'type-card';
-            document.getElementById('prices-rf').style.display = t=='RF'?'block':'none';
-            document.getElementById('prices-cn').style.display = t=='CN'?'block':'none';
-            
-            // Сброс выбора при смене страны
-            document.querySelectorAll('.price-item').forEach(i => i.classList.remove('selected'));
-            if(t == 'RF') {
-                curPrice = '99₽'; curTariff = 'Spark Base';
-                document.querySelector('#prices-rf .price-item').classList.add('selected');
-            } else {
-                curPrice = '490₽'; curTariff = 'China Lite';
-                document.querySelector('#prices-cn .price-item').classList.add('selected');
-            }
-        }
-
-        function setPrice(el, p, n) {
-            document.querySelectorAll('.price-item').forEach(i => i.classList.remove('selected'));
-            el.classList.add('selected');
-            curPrice = p; curTariff = n;
-        }
-
-        function show(id) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            if(id != 'screen-main') tg.MainButton.hide();
-        }
-
-        function pay() {
-            fetch(makeUrl, { 
-                method:'POST', 
-                headers:{'Content-Type':'application/json'}, 
-                body:JSON.stringify({
-                    vin: document.getElementById('res-vin').innerText, 
-                    price: curPrice, 
-                    tariff: curTariff,
-                    user: tg.initDataUnsafe.user,
-                    status: 'pay_clicked'
-                }) 
-            });
-            tg.showAlert("Запрос на оплату отправлен в бот!");
-            setTimeout(() => tg.close(), 2000);
-        }
-    </script>
-</body>
-</html>
