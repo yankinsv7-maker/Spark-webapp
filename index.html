@@ -6,71 +6,144 @@
     <title>SPARK AUTO</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { background: #000; color: #fff; font-family: -apple-system, sans-serif; margin: 0; padding: 15px; display: flex; justify-content: center; }
-        .app { width: 100%; max-width: 400px; }
+        body { background: #000; color: #fff; font-family: -apple-system, sans-serif; margin: 0; padding: 15px; }
+        .app { width: 100%; max-width: 400px; margin: 0 auto; }
         .screen { display: none; }
         .active { display: block; }
-        h2 { text-align: center; font-size: 24px; margin: 10px 0 20px; color: #34c759; }
+        h2 { text-align: center; color: #34c759; margin: 10px 0; }
         .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
-        .tab { flex: 1; padding: 12px; background: #1c1c1e; border-radius: 12px; text-align: center; cursor: pointer; border: 2px solid transparent; color: #888; font-weight: bold; }
+        .tab { flex: 1; padding: 12px; background: #1c1c1e; border-radius: 12px; text-align: center; cursor: pointer; border: 2px solid transparent; color: #888; }
         .tab.active-rf { border-color: #007aff; color: #fff; }
         .tab.active-cn { border-color: #ff3b30; color: #fff; }
-        .item { background: #1c1c1e; padding: 15px; border-radius: 12px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #333; cursor: pointer; }
+        .item { background: #1c1c1e; padding: 15px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #333; cursor: pointer; }
         .item.selected { border-color: #34c759; background: #1e2a1e; }
-        .item b { display: block; font-size: 16px; }
-        .item span { font-size: 11px; color: #aaa; }
-        .price { color: #34c759; font-weight: bold; font-size: 18px; }
-        input { width: 100%; padding: 18px; background: #1c1c1e; border: 1px solid #333; border-radius: 12px; color: #fff; font-size: 18px; text-align: center; margin: 15px 0; box-sizing: border-box; }
+        .price { color: #34c759; font-weight: bold; }
+        input { width: 100%; padding: 15px; background: #1c1c1e; border: 1px solid #333; border-radius: 12px; color: #fff; font-size: 18px; text-align: center; margin-bottom: 15px; box-sizing: border-box; }
         .btn { width: 100%; padding: 20px; border-radius: 14px; border: none; font-weight: bold; background: #34c759; color: #fff; cursor: pointer; }
-        .loader { border: 4px solid #333; border-top: 4px solid #34c759; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 80px auto 20px; }
+        .loader { border: 4px solid #333; border-top: 4px solid #34c759; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 50px auto 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
-
 <div class="app">
     <div id="s-main" class="screen active">
         <h2>SPARK AUTO</h2>
         <div class="tabs">
-            <div id="t-rf" class="tab active-rf" onclick="setTab('RF')">🇷🇺 РФ</div>
-            <div id="t-cn" class="tab" onclick="setTab('CN')">🇨🇳 КИТАЙ</div>
+            <div id="t-rf" class="tab active-rf" onclick="changeTab('RF')">🇷🇺 РФ</div>
+            <div id="t-cn" class="tab" onclick="changeTab('CN')">🇨🇳 КИТАЙ</div>
         </div>
-
         <div id="group-rf">
-            <div class="item selected" onclick="setPrice(this, '99', 'Spark Базовый')">
-                <div><b>Spark Базовый</b><span>ГИБДД, ФНП, ФССП</span></div>
+            <div class="item selected" onclick="selectTariff(this, '99', 'Spark Базовый')">
+                <div><b>Spark Базовый</b><br><small>ГИБДД, Ограничения</small></div>
                 <div class="price">99₽</div>
             </div>
-            <div class="item" onclick="setPrice(this, '299', 'Spark Стандарт')">
-                <div><b>Spark Стандарт</b><span>Базовый + ДТП и Пробеги</span></div>
+            <div class="item" onclick="selectTariff(this, '299', 'Spark Стандарт')">
+                <div><b>Spark Стандарт</b><br><small>Базовый + ДТП</small></div>
                 <div class="price">299₽</div>
             </div>
-            <div class="item" onclick="setPrice(this, '399', 'Spark Полный')">
-                <div><b>Spark Полный</b><span>Все базы + Аукционы</span></div>
+            <div class="item" onclick="selectTariff(this, '399', 'Spark Полный')">
+                <div><b>Spark Полный</b><br><small>Все базы + Аукционы</small></div>
                 <div class="price">399₽</div>
             </div>
         </div>
-
         <div id="group-cn" style="display:none">
-            <div class="item" onclick="setPrice(this, '499', 'Китай Общий')">
-                <div><b>Китай Общий</b><span>Заводские данные</span></div>
+            <div class="item" onclick="selectTariff(this, '499', 'Китай Общий')">
+                <div><b>Китай Общий</b><br><small>Заводские данные</small></div>
                 <div class="price">499₽</div>
             </div>
-            <div class="item" onclick="setPrice(this, '999', 'Китай Чабоши')">
-                <div><b>Китай Чабоши (FULL)</b><span>История Китая + Пробег</span></div>
+            <div class="item" onclick="selectTariff(this, '999', 'Китай Чабоши')">
+                <div><b>Китай Чабоши</b><br><small>Полная история</small></div>
                 <div class="price">999₽</div>
             </div>
         </div>
-
-        <input type="text" id="vin" placeholder="VIN ИЛИ ГОСНОМЕР" style="text-transform: uppercase;">
-        <button class="btn" onclick="runSearch()">ЗАПУСТИТЬ ПРОВЕРКУ</button>
+        <input type="text" id="vinInput" placeholder="VIN ИЛИ ГОСНОМЕР">
+        <button class="btn" onclick="goToLoading()">ПРОВЕРИТЬ</button>
     </div>
 
     <div id="s-load" class="screen">
         <div class="loader"></div>
-        <h3 style="text-align:center">АНАЛИЗИРУЕМ БАЗЫ...</h3>
+        <p style="text-align:center">Ищем данные...</p>
     </div>
 
     <div id="s-res" class="screen">
-        <h2 style="color:#34c759">ОТЧЕТ ГОТОВ!</h2>
-        <div style="background:#
+        <h2>ОТЧЕТ ГОТОВ</h2>
+        <div style="background:#1c1c1e; padding:15px; border-radius:12px; margin-bottom:20px; border:1px solid #333;">
+            <p>Объект: <b id="finalVin"></b></p>
+            <p>Тариф: <b id="finalTariff"></b></p>
+            <p style="font-size:20px">Цена: <b id="finalPrice" style="color:#34c759"></b> ₽</p>
+        </div>
+        <button id="payBtn" class="btn" onclick="executePayment()">ОПЛАТИТЬ</button>
+    </div>
+</div>
+
+<script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+    
+    let currentPrice = "99";
+    let currentTariff = "Spark Базовый";
+    const WEBHOOK_URL = "https://hook.eu1.make.com/npo0qky9rt2xh7x46ftxgyanmgzxehcm";
+
+    function changeTab(type) {
+        document.getElementById('t-rf').className = type === 'RF' ? 'tab active-rf' : 'tab';
+        document.getElementById('t-cn').className = type === 'CN' ? 'tab active-cn' : 'tab';
+        document.getElementById('group-rf').style.display = type === 'RF' ? 'block' : 'none';
+        document.getElementById('group-cn').style.display = type === 'CN' ? 'block' : 'none';
+        
+        const firstItem = type === 'RF' ? document.querySelector('#group-rf .item') : document.querySelector('#group-cn .item');
+        selectTariff(firstItem, type === 'RF' ? '99' : '499', type === 'RF' ? 'Spark Базовый' : 'Китай Общий');
+    }
+
+    function selectTariff(el, p, t) {
+        document.querySelectorAll('.item').forEach(i => i.classList.remove('selected'));
+        el.classList.add('selected');
+        currentPrice = p;
+        currentTariff = t;
+    }
+
+    function goToLoading() {
+        const vin = document.getElementById('vinInput').value.trim();
+        if (vin.length < 4) return alert("Введите VIN!");
+        
+        document.getElementById('finalVin').innerText = vin.toUpperCase();
+        document.getElementById('finalTariff').innerText = currentTariff;
+        document.getElementById('finalPrice').innerText = currentPrice;
+        
+        document.getElementById('s-main').classList.remove('active');
+        document.getElementById('s-load').classList.add('active');
+        
+        setTimeout(() => {
+            document.getElementById('s-load').classList.remove('active');
+            document.getElementById('s-res').classList.add('active');
+        }, 1200);
+    }
+
+    function executePayment() {
+        const btn = document.getElementById('payBtn');
+        btn.innerText = "СВЯЗЬ С СЕРВЕРОМ...";
+        btn.disabled = true;
+
+        const data = {
+            vin: document.getElementById('finalVin').innerText,
+            price: currentPrice,
+            tariff: currentTariff,
+            user_id: String(tg.initDataUnsafe?.user?.id || "0")
+        };
+
+        fetch(WEBHOOK_URL, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        })
+        .then(() => {
+            setTimeout(() => { tg.close(); }, 500);
+        })
+        .catch(() => {
+            alert("Ошибка связи! Попробуйте еще раз.");
+            btn.disabled = false;
+            btn.innerText = "ОПЛАТИТЬ";
+        });
+    }
+</script>
+</body>
+</html>
