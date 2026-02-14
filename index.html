@@ -23,28 +23,12 @@
         input { width: 100%; padding: 18px; background: #1c1c1e; border: 1px solid #333; border-radius: 12px; color: #fff; font-size: 18px; text-align: center; margin: 15px 0; box-sizing: border-box; }
         .check-row { display: flex; gap: 10px; font-size: 12px; color: #888; margin-bottom: 20px; align-items: flex-start; }
         .check-row input { width: 22px; height: 22px; margin: 0; flex-shrink: 0; }
-        .check-row a { color: #007aff; text-decoration: underline; cursor: pointer; }
         .btn { width: 100%; padding: 20px; border-radius: 14px; border: none; font-weight: bold; font-size: 16px; cursor: pointer; text-transform: uppercase; background: #34c759; color: #fff; }
         .loader { border: 4px solid #333; border-top: 4px solid #34c759; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 100px auto 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); }
-        .modal-content { background: #1c1c1e; margin: 10% auto; padding: 20px; border-radius: 15px; width: 85%; max-height: 70vh; overflow-y: auto; border: 1px solid #333; }
     </style>
 </head>
 <body>
-
-<div id="modal" class="modal">
-    <div class="modal-content">
-        <h3>Оферта и правила</h3>
-        <p>
-            <b>1. Предмет соглашения:</b> Сервис предоставляет данные об истории ТС.<br><br>
-            <b>2. Оплата:</b> Платеж окончательный. Отчет формируется после оплаты.<br><br>
-            <b>3. Ответственность:</b> SPARK AUTO не несет ответственности за неточности в базах.<br><br>
-            <b>4. Конфиденциальность:</b> Ваши данные защищены.
-        </p>
-        <button class="btn" onclick="document.getElementById('modal').style.display='none'">ПОНЯТНО</button>
-    </div>
-</div>
 
 <div class="app">
     <div id="s-main" class="screen active">
@@ -62,16 +46,8 @@
                 <div><b>Spark Standard</b><span>Пробеги, Владельцы</span></div>
                 <div class="price">199₽</div>
             </div>
-            <div class="item" onclick="setPrice(this, '299', 'Spark Full')">
-                <div><b>Spark Full</b><span>ДТП, Ремонты, Такси</span></div>
-                <div class="price">299₽</div>
-            </div>
         </div>
         <div id="group-cn" style="display:none">
-            <div class="item" onclick="setPrice(this, '490', 'China Lite')">
-                <div><b>China Lite</b><span>Тех-данные, Экспорт</span></div>
-                <div class="price">490₽</div>
-            </div>
             <div class="item" onclick="setPrice(this, '1490', 'China Full')">
                 <div><b>China Full</b><span>История обслуживания</span></div>
                 <div class="price">1490₽</div>
@@ -79,8 +55,8 @@
         </div>
         <input type="text" id="vin" placeholder="VIN ИЛИ ГОСНОМЕР">
         <div class="check-row">
-            <input type="checkbox" id="agreed">
-            <span>Я принимаю условия <a onclick="document.getElementById('modal').style.display='block'">оферты</a></span>
+            <input type="checkbox" id="agreed" checked>
+            <span>Я принимаю условия оферты</span>
         </div>
         <button class="btn" onclick="runSearch()">ЗАПУСТИТЬ ПРОВЕРКУ</button>
     </div>
@@ -95,17 +71,19 @@
         <div style="background:#1c1c1e; padding:20px; border-radius:12px; margin-bottom:20px;">
             <p>Объект: <b id="res-vin"></b></p>
             <p>Тариф: <b id="res-tariff"></b></p>
-            <hr style="border:0; border-top:1px solid #333; margin:15px 0;">
             <p style="font-size:20px">К оплате: <b id="res-price"></b> ₽</p>
         </div>
-        <button class="btn" onclick="sendPay()">ОПЛАТИТЬ И ПОЛУЧИТЬ</button>
+        <button id="pay-btn" class="btn" onclick="sendPay()">ОПЛАТИТЬ И ПОЛУЧИТЬ</button>
     </div>
 </div>
 
 <script>
     const tg = window.Telegram.WebApp;
     tg.expand();
-    const HOOK_URL = "https://hook.eu1.make.com/9ddudragp3yeyhrv5ko1yi26e80wjca0";
+    
+    // ВСТАВИЛ ТВОЙ НОВЫЙ ВЕБХУК
+    const HOOK_URL = "https://hook.eu1.make.com/npo0qky9rt2xh7x46ftxgyanmgzxehcm";
+    
     let curPrice = "99", curTariff = "Spark Base";
 
     function setTab(c) {
@@ -114,7 +92,7 @@
         document.getElementById('group-rf').style.display = c==='RF' ? 'block' : 'none';
         document.getElementById('group-cn').style.display = c==='CN' ? 'block' : 'none';
         if(c==='RF') setPrice(document.querySelector('#group-rf .item'), '99', 'Spark Base');
-        else setPrice(document.querySelector('#group-cn .item'), '490', 'China Lite');
+        else setPrice(document.querySelector('#group-cn .item'), '1490', 'China Full');
     }
 
     function setPrice(el, p, t) {
@@ -124,7 +102,6 @@
     }
 
     function runSearch() {
-        if(!document.getElementById('agreed').checked) return alert("Примите оферту!");
         const v = document.getElementById('vin').value;
         if(v.length < 5) return alert("Введите VIN!");
         
@@ -138,10 +115,14 @@
         setTimeout(() => {
             document.getElementById('s-load').classList.remove('active');
             document.getElementById('s-res').classList.add('active');
-        }, 2000);
+        }, 1500);
     }
 
     function sendPay() {
+        const btn = document.getElementById('pay-btn');
+        btn.innerText = "ОТПРАВКА...";
+        btn.disabled = true;
+
         const userId = tg.initDataUnsafe?.user?.id || "no_id";
         
         fetch(HOOK_URL, {
@@ -154,11 +135,14 @@
                 tariff: curTariff,
                 user_id: userId
             })
+        }).then(() => {
+            // Закрываем приложение, чтобы пользователь увидел счет в чате
+            setTimeout(() => { tg.close(); }, 500);
+        }).catch(() => {
+            alert("Ошибка связи с сервером");
+            btn.innerText = "ОПЛАТИТЬ И ПОЛУЧИТЬ";
+            btn.disabled = false;
         });
-        
-        setTimeout(() => {
-            tg.close();
-        }, 200);
     }
 </script>
 </body>
