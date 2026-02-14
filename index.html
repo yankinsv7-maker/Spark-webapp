@@ -27,8 +27,6 @@
         .btn { width: 100%; padding: 20px; border-radius: 14px; border: none; font-weight: bold; font-size: 16px; cursor: pointer; text-transform: uppercase; background: #34c759; color: #fff; }
         .loader { border: 4px solid #333; border-top: 4px solid #34c759; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 100px auto 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        /* ОКНО ОФЕРТЫ */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); }
         .modal-content { background: #1c1c1e; margin: 10% auto; padding: 20px; border-radius: 15px; width: 85%; max-height: 70vh; overflow-y: auto; border: 1px solid #333; }
     </style>
@@ -38,10 +36,10 @@
 <div id="modal" class="modal">
     <div class="modal-content">
         <h3>Оферта и правила</h3>
-        <p id="oferta-text">
-            <b>1. Предмет соглашения:</b> Сервис предоставляет данные об истории ТС из открытых и закрытых источников.<br><br>
-            <b>2. Оплата:</b> Платеж является окончательным. Отчет формируется сразу после подтверждения транзакции.<br><br>
-            <b>3. Ответственность:</b> SPARK AUTO не несет ответственности за неточности в базах госорганов.<br><br>
+        <p>
+            <b>1. Предмет соглашения:</b> Сервис предоставляет данные об истории ТС.<br><br>
+            <b>2. Оплата:</b> Платеж окончательный. Отчет формируется после оплаты.<br><br>
+            <b>3. Ответственность:</b> SPARK AUTO не несет ответственности за неточности в базах.<br><br>
             <b>4. Конфиденциальность:</b> Ваши данные защищены.
         </p>
         <button class="btn" onclick="document.getElementById('modal').style.display='none'">ПОНЯТНО</button>
@@ -55,7 +53,6 @@
             <div id="t-rf" class="tab active-rf" onclick="setTab('RF')">🇷🇺 РФ</div>
             <div id="t-cn" class="tab" onclick="setTab('CN')">🇨🇳 КИТАЙ</div>
         </div>
-
         <div id="group-rf">
             <div class="item selected" onclick="setPrice(this, '99', 'Spark Base')">
                 <div><b>Spark Base</b><span>Угон, залоги, аресты</span></div>
@@ -70,7 +67,6 @@
                 <div class="price">299₽</div>
             </div>
         </div>
-
         <div id="group-cn" style="display:none">
             <div class="item" onclick="setPrice(this, '490', 'China Lite')">
                 <div><b>China Lite</b><span>Тех-данные, Экспорт</span></div>
@@ -81,14 +77,11 @@
                 <div class="price">1490₽</div>
             </div>
         </div>
-
         <input type="text" id="vin" placeholder="VIN ИЛИ ГОСНОМЕР">
-
         <div class="check-row">
             <input type="checkbox" id="agreed">
             <span>Я принимаю условия <a onclick="document.getElementById('modal').style.display='block'">оферты</a></span>
         </div>
-
         <button class="btn" onclick="runSearch()">ЗАПУСТИТЬ ПРОВЕРКУ</button>
     </div>
 
@@ -134,33 +127,6 @@
         if(!document.getElementById('agreed').checked) return alert("Примите оферту!");
         const v = document.getElementById('vin').value;
         if(v.length < 5) return alert("Введите VIN!");
-        
         document.getElementById('res-vin').innerText = v;
         document.getElementById('res-tariff').innerText = curTariff;
-        document.getElementById('res-price').innerText = curPrice;
-        
-        document.getElementById('s-main').classList.remove('active');
-        document.getElementById('s-load').classList.add('active');
-        setTimeout(() => {
-            document.getElementById('s-load').classList.remove('active');
-            document.getElementById('s-res').classList.add('active');
-        }, 2000);
-    }
-
-    function sendPay() {
-        fetch(HOOK_URL, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ 
-                action: 'pay', 
-                vin: document.getElementById('res-vin').innerText, 
-                price: curPrice, 
-                tariff: curTariff,
-                telegram_id: tg.initDataUnsafe?.user?.id || "no_id"
-            })
-        });
-        tg.close();
-    }
-</script>
-</body>
-</html>
+        document.getElementById
