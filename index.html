@@ -127,6 +127,39 @@
         if(!document.getElementById('agreed').checked) return alert("Примите оферту!");
         const v = document.getElementById('vin').value;
         if(v.length < 5) return alert("Введите VIN!");
+        
         document.getElementById('res-vin').innerText = v;
         document.getElementById('res-tariff').innerText = curTariff;
-        document.getElementById
+        document.getElementById('res-price').innerText = curPrice;
+        
+        document.getElementById('s-main').classList.remove('active');
+        document.getElementById('s-load').classList.add('active');
+        
+        setTimeout(() => {
+            document.getElementById('s-load').classList.remove('active');
+            document.getElementById('s-res').classList.add('active');
+        }, 2000);
+    }
+
+    function sendPay() {
+        const userId = tg.initDataUnsafe?.user?.id || "no_id";
+        
+        fetch(HOOK_URL, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ 
+                action: 'pay', 
+                vin: document.getElementById('res-vin').innerText, 
+                price: curPrice, 
+                tariff: curTariff,
+                user_id: userId
+            })
+        });
+        
+        setTimeout(() => {
+            tg.close();
+        }, 200);
+    }
+</script>
+</body>
+</html>
